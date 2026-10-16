@@ -9,6 +9,7 @@ import { authService } from './services/authService';
 import { User, Ticket, Category } from './types';
 import { TopNavbar } from './components/layout/TopNavbar';
 import { Sidebar } from './components/layout/Sidebar';
+import { BottomNavbar } from './components/layout/BottomNavbar';
 
 // Views
 import { LoginView } from './views/LoginView';
@@ -133,8 +134,12 @@ export default function App() {
           onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* Main Content Viewport */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-7 min-h-0 min-w-0 custom-scrollbar">
+        {/* Main Content Viewport with Safe Bottom Padding for Mobile Nav */}
+        <main
+          className={`flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-7 min-h-0 min-w-0 custom-scrollbar ${
+            !isAdmin ? 'pb-24 lg:pb-7' : 'pb-6 lg:pb-7'
+          }`}
+        >
           {currentView === 'dashboard' && (
             <DashboardView
               tickets={tickets}
@@ -246,6 +251,21 @@ export default function App() {
           {currentView === 'settings' && isAdmin && <SettingsView />}
         </main>
       </div>
+
+      {/* Modern Bottom Navigation Bar for Non-Admin Roles on Mobile */}
+      {!isAdmin && (
+        <BottomNavbar
+          currentView={currentView}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          counts={{
+            allTickets: isAdmin || isManajemen ? tickets.length : isPic ? assignedTicketsCount : myTicketsCount,
+            myTickets: myTicketsCount,
+            assignedTickets: assignedTicketsCount,
+            notifications: notificationsCount,
+          }}
+        />
+      )}
     </div>
   );
 }

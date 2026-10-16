@@ -63,7 +63,7 @@ export const NotificationView: React.FC<NotificationViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 w-full sm:w-auto">
           <div className="flex p-1 bg-slate-100 rounded-lg text-xs font-semibold">
             <button
               onClick={() => setFilter('all')}
@@ -86,7 +86,7 @@ export const NotificationView: React.FC<NotificationViewProps> = ({
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="text-xs text-[#1765B3] hover:text-[#0A3D73] font-bold cursor-pointer transition-colors"
+              className="text-xs text-[#1765B3] hover:text-[#0A3D73] font-bold cursor-pointer transition-colors whitespace-nowrap"
             >
               Tandai Semua Dibaca
             </button>

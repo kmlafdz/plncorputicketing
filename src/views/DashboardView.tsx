@@ -1414,7 +1414,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Tidak ada antrean tiket prioritas yang memerlukan tindakan segera.
             </div>
           ) : (
-            <table className="w-full text-left border-collapse text-xs min-w-[640px]">
+            <>
+              {/* Mobile Card View (< md:) */}
+              <div className="md:hidden divide-y divide-slate-100 bg-white">
+                {urgentTickets.map((ticket) => {
+                  const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
+                  return (
+                    <div
+                      key={ticket.id}
+                      onClick={() => onNavigate('ticket-detail', ticket.id)}
+                      className="p-3.5 space-y-2 active:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono-numbers font-bold text-xs text-[#1765B3]">
+                          #{ticket.ticketNumber}
+                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <PriorityBadge priority={ticket.priority} size="sm" />
+                          <StatusBadge status={ticket.status} size="sm" />
+                        </div>
+                      </div>
+
+                      <div className="font-semibold text-xs text-[#0F172A] leading-snug line-clamp-2">
+                        {ticket.title}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-mono-numbers">
+                        <span
+                          className={`font-semibold ${
+                            sla.isOverdue
+                              ? 'text-rose-600'
+                              : sla.isNearingBreach
+                              ? 'text-amber-600'
+                              : 'text-slate-600'
+                          }`}
+                        >
+                          SLA: {sla.remainingFormatted}
+                        </span>
+                        <span className="text-slate-500 font-medium">
+                          {ticket.categoryName}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop / Tablet Table View (>= md:) */}
+              <table className="hidden md:table w-full text-left border-collapse text-xs min-w-[640px]">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                   <th className="py-3 px-4">Nomor Tiket</th>
@@ -1493,6 +1540,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 })}
               </tbody>
             </table>
+            </>
           )}
         </div>
       </div>

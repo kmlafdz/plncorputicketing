@@ -50,16 +50,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isPelapor = currentUser.role === 'pelapor';
   const isManajemen = currentUser.role === 'manajemen';
 
-  // Lock body scroll when mobile drawer is open to prevent background jitter
+  // Lock body scroll when mobile drawer is open to prevent background jitter (admin only)
   useEffect(() => {
-    if (isMobileOpen) {
+    if (isAdmin && isMobileOpen) {
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       return () => {
         document.body.style.overflow = originalOverflow;
       };
     }
-  }, [isMobileOpen]);
+  }, [isAdmin, isMobileOpen]);
 
   // Handle ESC key to fluently dismiss drawer
   useEffect(() => {
@@ -299,50 +299,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Slide-Over Drawer with Pure Spring Physics & Fluid Motion */}
-      <AnimatePresence>
-        {isMobileOpen && (
-          <div
-            className="fixed inset-0 z-50 lg:hidden overflow-hidden pointer-events-auto"
-            aria-modal="true"
-            role="dialog"
-          >
-            {/* Smooth Backdrop Fade */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.28, ease: 'easeOut' }}
-              onClick={onCloseMobile}
-              className="fixed inset-0 bg-slate-950/45 will-change-[opacity]"
-            />
-
-            {/* Fluent Spring Physics Drawer Panel */}
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: '0%' }}
-              exit={{ x: '-100%' }}
-              transition={{
-                type: 'spring',
-                damping: 32,
-                stiffness: 320,
-                mass: 0.8,
-              }}
-              drag="x"
-              dragConstraints={{ left: -320, right: 0 }}
-              dragElastic={{ left: 0.08, right: 0.01 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -60 || info.velocity.x < -250) {
-                  onCloseMobile?.();
-                }
-              }}
-              className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden touch-pan-y"
+      {/* Mobile Slide-Over Drawer with Pure Spring Physics & Fluid Motion (Admin Only) */}
+      {isAdmin && (
+        <AnimatePresence>
+          {isMobileOpen && (
+            <div
+              className="fixed inset-0 z-50 lg:hidden overflow-hidden pointer-events-auto"
+              aria-modal="true"
+              role="dialog"
             >
-              {sidebarContent}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+              {/* Smooth Backdrop Fade */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                onClick={onCloseMobile}
+                className="fixed inset-0 bg-slate-950/45 will-change-[opacity]"
+              />
+
+              {/* Fluent Spring Physics Drawer Panel */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: '0%' }}
+                exit={{ x: '-100%' }}
+                transition={{
+                  type: 'spring',
+                  damping: 32,
+                  stiffness: 320,
+                  mass: 0.8,
+                }}
+                drag="x"
+                dragConstraints={{ left: -320, right: 0 }}
+                dragElastic={{ left: 0.08, right: 0.01 }}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -60 || info.velocity.x < -250) {
+                    onCloseMobile?.();
+                  }
+                }}
+                className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden touch-pan-y"
+              >
+                {sidebarContent}
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      )}
     </>
   );
 };

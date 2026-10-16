@@ -132,8 +132,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
       <div className="w-full px-2.5 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 max-w-full">
         {/* Left: Mobile Toggle & Brand Identity */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 sm:flex-initial">
-          {/* Hamburger button for Mobile / Tablet */}
-          {onToggleMobileMenu && (
+          {/* Hamburger button for Mobile / Tablet (Admin Only - non-admin uses BottomNavbar) */}
+          {currentUser.role === 'admin' && onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
               className="lg:hidden p-1.5 sm:p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] active:scale-90 transition-all cursor-pointer focus-ring shrink-0"

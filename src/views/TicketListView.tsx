@@ -277,8 +277,8 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
         </div>
 
         {/* Filter Toolbar */}
-        <div className="p-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 bg-white">
-          <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+        <div className="p-3 sm:p-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 bg-white">
+          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 w-full sm:w-auto">
             {/* Priority Filter */}
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-slate-500 font-medium hidden sm:inline">Prioritas:</span>
@@ -403,7 +403,70 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
               </button>
             </div>
           ) : (
-            <table className="w-full text-left border-collapse min-w-[700px]">
+            <>
+              {/* Mobile Card List View (< md:) */}
+              <div className="md:hidden divide-y divide-slate-100 bg-white">
+                {paginatedTickets.map((ticket) => {
+                  const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
+                  return (
+                    <div
+                      key={ticket.id}
+                      onClick={() => onNavigate('ticket-detail', ticket.id)}
+                      className="p-3.5 space-y-2 active:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono-numbers font-bold text-xs text-[#1765B3]">
+                          #{ticket.ticketNumber}
+                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <PriorityBadge priority={ticket.priority} size="sm" />
+                          <StatusBadge status={ticket.status} size="sm" />
+                        </div>
+                      </div>
+
+                      <div className="font-semibold text-xs text-[#0F172A] leading-snug line-clamp-2">
+                        {ticket.title}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
+                        <span className="bg-[#EFF8FF] text-[#0A3D73] px-2 py-0.5 rounded font-medium text-[10px]">
+                          {ticket.categoryName}
+                        </span>
+                        <span>·</span>
+                        <span className="text-slate-600 font-medium truncate max-w-[160px]">
+                          {ticket.currentPicName
+                            ? formatPicDisplayName(ticket.currentPicId, ticket.currentPicName)
+                            : 'Belum Ada PIC'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-mono-numbers">
+                        <span
+                          className={`flex items-center gap-1 font-semibold ${
+                            sla.isOverdue
+                              ? 'text-rose-600'
+                              : sla.isNearingBreach
+                              ? 'text-amber-600'
+                              : 'text-slate-600'
+                          }`}
+                        >
+                          <Clock className="w-3 h-3 shrink-0" />
+                          <span>SLA: {sla.remainingFormatted}</span>
+                        </span>
+                        <span className="text-slate-400">
+                          {new Date(ticket.createdAt).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop / Tablet Table View (>= md:) */}
+              <table className="hidden md:table w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                   <th className="py-3 px-4">Nomor Tiket</th>
@@ -527,6 +590,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                 })}
               </tbody>
             </table>
+            </>
           )}
         </div>
 
