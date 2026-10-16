@@ -32,24 +32,37 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     <div className="max-w-4xl mx-auto space-y-5">
       {/* Profile Card */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-100 pb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-extrabold text-2xl flex items-center justify-center shadow-md">
-            {currentUser.name
-              .split(' ')
-              .map((n) => n[0])
-              .slice(0, 2)
-              .join('')}
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold text-slate-900">{currentUser.name}</h1>
-              <span className="bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full">
-                {currentUser.role}
-              </span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-extrabold text-2xl flex items-center justify-center shadow-md shrink-0">
+              {currentUser.name
+                .split(' ')
+                .map((n) => n[0])
+                .slice(0, 2)
+                .join('')}
             </div>
-            <p className="text-xs text-slate-500 font-mono-numbers">NIP: {currentUser.employeeId}</p>
-            <p className="text-xs text-slate-600 font-medium">{currentUser.department}</p>
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-extrabold text-slate-900 truncate">{currentUser.name}</h1>
+                <span className="bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full shrink-0">
+                  {currentUser.role}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-mono-numbers">NIP: {currentUser.employeeId}</p>
+              <p className="text-xs text-slate-600 font-medium truncate">{currentUser.department}</p>
+            </div>
           </div>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-2 shadow-2xs transition-all active:scale-95 cursor-pointer shrink-0 self-stretch sm:self-auto justify-center"
+            >
+              <LogOut className="w-4 h-4 text-rose-500" />
+              <span>Keluar dari Akun</span>
+            </button>
+          )}
         </div>
 
         {/* Contact & Organization Details */}

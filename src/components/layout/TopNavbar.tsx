@@ -4,7 +4,6 @@ import {
   Search,
   User,
   ChevronDown,
-  LogOut,
   Clock,
   Settings as SettingsIcon,
   Menu,
@@ -369,35 +368,9 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                     </button>
                   )}
                 </div>
-
-                <div className="border-t border-[#E2E8F0] my-1" />
-
-                <div className="p-1">
-                  <button
-                    onClick={() => {
-                      setShowUserDropdown(false);
-                      onLogout();
-                    }}
-                    className="w-full px-3 py-2 text-left text-xs text-rose-600 hover:bg-rose-50 rounded-lg flex items-center gap-2.5 font-bold cursor-pointer transition-colors"
-                  >
-                    <LogOut className="w-4 h-4 text-rose-500" />
-                    <span>Keluar (Logout)</span>
-                  </button>
-                </div>
               </div>
             )}
           </div>
-
-          {/* Quick Dedicated Logout Button */}
-          <button
-            onClick={onLogout}
-            title="Keluar dari Akun (Logout)"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50/80 hover:bg-rose-100 hover:text-rose-700 border border-rose-200/80 transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
-            aria-label="Keluar dari akun"
-          >
-            <LogOut className="w-3.5 h-3.5 text-rose-500" />
-            <span className="hidden sm:inline">Keluar</span>
-          </button>
         </div>
       </div>
 
