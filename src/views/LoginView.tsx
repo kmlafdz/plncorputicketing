@@ -69,10 +69,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         {/* Top Header Identity */}
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-tr from-[#0A3D73] via-[#1765B3] to-[#2589E8] border border-white/25 flex items-center justify-center text-amber-300 shadow-xl shadow-blue-950/40">
-              <svg className="w-7 h-7 lg:w-8 lg:h-8 fill-current filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24">
-                <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
-              </svg>
+            <div className="h-14 lg:h-16 w-auto p-2 bg-white rounded-2xl shadow-xl shadow-blue-950/40 flex items-center justify-center shrink-0">
+              <img
+                src="/logo.png"
+                alt="Logo PLN"
+                className="h-full w-auto object-contain"
+              />
             </div>
             <div>
               <span className="font-extrabold text-base lg:text-lg tracking-tight block leading-none text-white font-heading">
@@ -153,10 +155,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         <div className="flex items-center justify-between w-full">
           {/* Mobile-only Emblem */}
           <div className="flex items-center gap-2.5 md:hidden">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0A3D73] to-[#2589E8] flex items-center justify-center text-amber-300 shadow-sm">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
-              </svg>
+            <div className="h-9 w-auto flex items-center justify-center shrink-0">
+              <img
+                src="/logo.png"
+                alt="Logo PLN"
+                className="h-9 w-auto object-contain drop-shadow-2xs rounded-xs"
+              />
             </div>
             <div>
               <span className="font-extrabold text-xs text-[#0F172A] block leading-none font-heading">PLN CORPU</span>

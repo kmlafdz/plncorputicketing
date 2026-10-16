@@ -131,10 +131,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Drawer Header with Close Button */}
       <div className="lg:hidden h-14 px-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC] shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0A3D73] to-[#2589E8] flex items-center justify-center text-amber-300 shrink-0 shadow-xs">
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
-            </svg>
+          <div className="h-8 w-auto flex items-center justify-center shrink-0">
+            <img
+              src="/logo.png"
+              alt="Logo PLN"
+              className="h-8 w-auto object-contain drop-shadow-2xs rounded-xs"
+            />
           </div>
           <div className="min-w-0">
             <span className="font-extrabold text-xs text-[#0F172A] block leading-none truncate">PLN CORPU</span>

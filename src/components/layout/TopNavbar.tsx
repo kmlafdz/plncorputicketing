@@ -149,11 +149,13 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
             onClick={() => onNavigate('dashboard')}
             className="flex items-center gap-2 sm:gap-2.5 text-left group cursor-pointer focus-ring rounded-lg p-0.5 min-w-0 truncate"
           >
-            {/* Stylized PLN Lightning Bolt Emblem */}
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0A3D73] via-[#1765B3] to-[#2589E8] flex items-center justify-center text-amber-300 shadow-sm border border-[#1765B3]/30 group-hover:scale-105 transition-transform shrink-0">
-              <svg className="w-4 h-4 sm:w-6 sm:h-6 fill-current filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24">
-                <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
-              </svg>
+            {/* Official PLN Logo */}
+            <div className="h-8 sm:h-9 w-auto flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <img
+                src="/logo.png"
+                alt="Logo PLN"
+                className="h-8 sm:h-9 w-auto object-contain drop-shadow-2xs rounded-xs"
+              />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
