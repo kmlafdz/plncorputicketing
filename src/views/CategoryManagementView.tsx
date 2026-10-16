@@ -12,7 +12,6 @@ import {
   Check,
   Search,
   Filter,
-  Sparkles,
   RefreshCw,
   Info,
   Hash,
@@ -356,7 +355,7 @@ export const CategoryManagementView: React.FC = () => {
               Integrasi Auto Assign
             </span>
             <div className="text-xs font-bold text-emerald-700 mt-1 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>Tersinkronisasi 100%</span>
             </div>
             <span className="text-[10px] text-[#64748B] font-medium mt-0.5 block">
@@ -607,7 +606,7 @@ export const CategoryManagementView: React.FC = () => {
             <div className="bg-gradient-to-r from-[#EFF8FF] via-[#D9EEFF] to-[#B8DEFF]/60 p-4 rounded-xl border border-[#B8DEFF] shadow-xs space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-[#1765B3] uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <Tag className="w-3.5 h-3.5 text-[#1765B3]" />
                   <span>Kode Kategori Tiket Otomatis</span>
                 </span>
                 <span className="text-[10px] font-bold text-[#2589E8] bg-white/90 px-2 py-0.5 rounded-full border border-[#B8DEFF]">

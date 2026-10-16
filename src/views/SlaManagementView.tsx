@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Clock,
   ShieldAlert,
-  Flame,
   CheckCircle2,
   Save,
   Info,

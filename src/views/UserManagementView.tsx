@@ -31,7 +31,6 @@ import {
   UserX,
   X,
   RefreshCw,
-  Sparkles,
   Info,
 } from 'lucide-react';
 import { User, Role, Ticket } from '../types';

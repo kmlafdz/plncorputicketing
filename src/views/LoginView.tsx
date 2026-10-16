@@ -7,10 +7,9 @@ import {
   AlertCircle,
   Loader2,
   ShieldCheck,
-  ArrowRight,
   HelpCircle,
   Clock,
-  Zap,
+  SlidersHorizontal,
   CheckCircle2,
   Building,
   Headphones,
@@ -87,7 +86,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
 
           <div className="pt-4 max-w-md">
             <span className="inline-block px-3 py-1 bg-white/10 border border-white/20 rounded-full text-xs font-semibold text-amber-300 mb-3">
-              ⚡ Portal Layanan Terpadu IT & Diklat
+              Portal Layanan Terpadu IT & Diklat
             </span>
             <h1 className="text-2xl lg:text-3xl xl:text-4xl font-black text-white tracking-tight leading-tight font-heading">
               Service Desk & Ticketing System
@@ -102,7 +101,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         <div className="relative z-10 py-8 my-auto space-y-4 max-w-md">
           <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs">
             <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400/20 to-amber-500/30 border border-amber-400/40 flex items-center justify-center shrink-0 text-amber-300 mt-0.5">
-              <Zap className="w-4 h-4" />
+              <SlidersHorizontal className="w-4 h-4" />
             </span>
             <div>
               <h3 className="text-xs lg:text-sm font-bold text-white leading-snug">Triase & Auto-Assignment Otomatis</h3>
@@ -166,7 +165,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </div>
 
           <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 ml-auto">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="font-semibold text-slate-700">Server Helpdesk Aktif</span>
           </div>
         </div>
@@ -298,10 +297,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     <span>Memverifikasi Kredensial...</span>
                   </>
                 ) : (
-                  <>
-                    <span>Masuk ke Sistem</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <span>Masuk ke Sistem</span>
                 )}
               </button>
             </div>

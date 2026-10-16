@@ -5,7 +5,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Hourglass,
-  Flame,
   PlusCircle,
   TrendingUp,
   ShieldAlert,
@@ -19,7 +18,7 @@ import {
   FileText,
   Activity,
   Layers,
-  Sparkles,
+  SlidersHorizontal,
   ShieldCheck,
   ArrowUpRight,
 } from 'lucide-react';
@@ -355,7 +354,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
             <div>
               <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
-                <Sparkles className="w-4 h-4 text-[#2589E8]" />
+                <SlidersHorizontal className="w-4 h-4 text-[#2589E8]" />
                 Pusat Kontrol & Konfigurasi Helpdesk (Admin)
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -366,7 +365,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {[
                 { id: 'pic-management', label: 'Manajemen PIC', desc: 'Beban & keahlian', icon: Users, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-                { id: 'auto-assignment', label: 'Auto-Assign', desc: 'Aturan routing tim', icon: Sparkles, color: 'text-amber-600 bg-amber-50 border-amber-200' },
+                { id: 'auto-assignment', label: 'Auto-Assign', desc: 'Aturan routing tim', icon: SlidersHorizontal, color: 'text-amber-600 bg-amber-50 border-amber-200' },
                 { id: 'user-management', label: 'Manajemen User', desc: 'Akun, NIP & Role', icon: UserCog, color: 'text-sky-600 bg-sky-50 border-sky-200' },
                 { id: 'category-management', label: 'Kategori Tiket', desc: 'Kode #TCU-XXXX', icon: Layers, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
                 { id: 'sla-management', label: 'Matriks SLA', desc: 'Target respon/resolusi', icon: Clock, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },

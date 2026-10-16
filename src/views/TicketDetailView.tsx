@@ -20,7 +20,7 @@ import {
   Tag,
   MapPin,
   Laptop,
-  Flame,
+  SlidersHorizontal,
   Printer,
   ChevronRight,
   Eye,
@@ -534,7 +534,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
                 }}
                 className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-semibold shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <Flame className="w-3.5 h-3.5 text-orange-500" />
+                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-600" />
                 <span>Ubah Prioritas</span>
               </button>
             )}
@@ -704,7 +704,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
                 {ticket.priorityChangeReason && (
                   <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
                     <span className="font-bold flex items-center gap-1.5">
-                      <Flame className="w-4 h-4 text-amber-600" />
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
                       Catatan Penyesuaian Prioritas (Admin):
                     </span>
                     <p>{ticket.priorityChangeReason}</p>

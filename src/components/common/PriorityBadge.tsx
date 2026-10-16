@@ -12,8 +12,8 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ priority, size = '
 
   switch (priority) {
     case 'Kritis':
-      badgeStyle = 'bg-rose-50 text-rose-950 border-rose-300 shadow-[0_0_8px_rgba(244,63,94,0.15)] font-bold';
-      indicator = 'bg-rose-600 animate-pulse';
+      badgeStyle = 'bg-rose-50 text-rose-950 border-rose-300 font-bold';
+      indicator = 'bg-rose-600';
       break;
     case 'Tinggi':
       badgeStyle = 'bg-orange-50 text-orange-950 border-orange-300 font-semibold';

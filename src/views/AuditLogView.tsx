@@ -5,13 +5,11 @@ import {
   Filter,
   Clock,
   User,
-  ArrowRight,
   Download,
   Activity,
   CheckCircle2,
   AlertTriangle,
   UserCheck,
-  Flame,
   XCircle,
   RotateCcw,
   MessageSquare,
@@ -94,10 +92,10 @@ export const AuditLogView: React.FC<AuditLogViewProps> = ({ onNavigate }) => {
         </span>
       );
     }
-    if (actUpper.includes('PRIORITAS') || actUpper.includes('FLAME')) {
+    if (actUpper.includes('PRIORITAS')) {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-          <Flame className="w-3 h-3 text-amber-600" />
+          <AlertTriangle className="w-3 h-3 text-amber-600" />
           {action.replace(/_/g, ' ')}
         </span>
       );

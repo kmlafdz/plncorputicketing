@@ -10,12 +10,10 @@ import {
   Layers,
   MapPin,
   Laptop,
-  Flame,
-  ArrowRight,
   Shield,
   UserCheck,
   Wrench,
-  Sparkles,
+  SlidersHorizontal,
 } from 'lucide-react';
 import {
   Ticket,
@@ -172,7 +170,7 @@ export const CreateTicketView: React.FC<CreateTicketViewProps> = ({
           <div className="p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] text-left space-y-2.5">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <span className="text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-amber-500" />
+                <SlidersHorizontal className="w-4 h-4 text-[#1765B3]" />
                 Status Penugasan PIC:
               </span>
               <span
@@ -220,7 +218,6 @@ export const CreateTicketView: React.FC<CreateTicketViewProps> = ({
               className="w-full sm:w-auto px-5 py-2.5 bg-gradient-primary hover:opacity-95 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer focus-ring"
             >
               <span>Lihat Detail & Lacak Progres</span>
-              <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => {

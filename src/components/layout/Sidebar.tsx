@@ -15,7 +15,7 @@ import {
   Settings,
   User,
   LogOut,
-  Sparkles,
+  SlidersHorizontal,
   X,
 } from 'lucide-react';
 import { User as UserType } from '../../types';
@@ -177,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div className="space-y-0.5">
               {navItem('pic-management', 'Manajemen PIC', Users)}
-              {navItem('auto-assignment', 'Pengaturan Penugasan', Sparkles)}
+              {navItem('auto-assignment', 'Pengaturan Penugasan', SlidersHorizontal)}
               {navItem('user-management', 'Manajemen User', UserCog)}
               {navItem('category-management', 'Kategori Tiket', Layers)}
               {navItem('sla-management', 'SLA dan Prioritas', Clock)}

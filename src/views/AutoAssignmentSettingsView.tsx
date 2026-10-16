@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
+  SlidersHorizontal,
   Layers,
   Wrench,
   Users,
@@ -11,7 +11,6 @@ import {
   RotateCcw,
   Shield,
   Clock,
-  ArrowRight,
   TrendingDown,
 } from 'lucide-react';
 import { AutoAssignmentRule, User, Ticket } from '../types';
@@ -137,7 +136,7 @@ export const AutoAssignmentSettingsView: React.FC<AutoAssignmentSettingsViewProp
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Aturan Aktif</span>
-            <Sparkles className="w-4 h-4 text-amber-500" />
+            <SlidersHorizontal className="w-4 h-4 text-[#1765B3]" />
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2 font-mono-numbers">
             {rules.filter((r) => r.isActive).length} <span className="text-xs font-normal text-slate-400">/ {rules.length} Kategori</span>

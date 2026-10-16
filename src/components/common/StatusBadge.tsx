@@ -14,25 +14,25 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
 
   switch (status) {
     case 'Baru':
-      dotColor = 'bg-[#2589E8] shadow-[0_0_6px_#2589E8]';
+      dotColor = 'bg-[#2589E8]';
       textColor = 'text-[#0A3D73]';
       bgColor = 'bg-[#EFF8FF]';
       borderColor = 'border-[#B8DEFF]';
       break;
     case 'Diverifikasi':
-      dotColor = 'bg-indigo-600 shadow-[0_0_6px_#6366F1]';
+      dotColor = 'bg-indigo-600';
       textColor = 'text-indigo-900';
       bgColor = 'bg-indigo-50';
       borderColor = 'border-indigo-200';
       break;
     case 'Ditugaskan':
-      dotColor = 'bg-purple-600 shadow-[0_0_6px_#A855F7]';
+      dotColor = 'bg-purple-600';
       textColor = 'text-purple-900';
       bgColor = 'bg-purple-50';
       borderColor = 'border-purple-200';
       break;
     case 'Dalam Proses':
-      dotColor = 'bg-sky-500 animate-pulse';
+      dotColor = 'bg-sky-500';
       textColor = 'text-sky-900';
       bgColor = 'bg-sky-50';
       borderColor = 'border-sky-300';
@@ -56,7 +56,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
       borderColor = 'border-violet-300';
       break;
     case 'Selesai':
-      dotColor = 'bg-emerald-600 shadow-[0_0_6px_#10B981]';
+      dotColor = 'bg-emerald-600';
       textColor = 'text-emerald-950';
       bgColor = 'bg-emerald-50';
       borderColor = 'border-emerald-300';
