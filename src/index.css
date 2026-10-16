@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary-blue: #2589E8;
+    --deep-blue: #1765B3;
+    --light-blue: #D9EEFF;
+    --pale-blue: #EFF8FF;
+    --sky-blue: #B8DEFF;
+    --bg-main: #F5FAFF;
+    --border-enterprise: #DCEAF7;
+    --text-primary: #172B4D;
+    --text-secondary: #64748B;
+    --hover-bg: #EAF5FF;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #F5FAFF;
+    color: #172B4D;
+  }
+  
+  .font-mono-numbers {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Gradients as specified in PLN CorpU Enterprise Design System */
+.bg-gradient-enterprise {
+  background: linear-gradient(135deg, #D9EEFF 0%, #FFFFFF 55%, #B8DEFF 100%);
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(120deg, #EAF5FF 0%, #D6EBFF 50%, #FFFFFF 100%);
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #2589E8 0%, #1765B3 100%);
+}
+
+.bg-gradient-primary-hover:hover {
+  background: linear-gradient(135deg, #1d74c9 0%, #125496 100%);
+}
+
+.bg-gradient-card {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F0F8FF 100%);
+}
+
+.border-enterprise {
+  border-color: #DCEAF7;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
