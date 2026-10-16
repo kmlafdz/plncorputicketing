@@ -49,6 +49,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isPelapor = currentUser.role === 'pelapor';
   const isManajemen = currentUser.role === 'manajemen';
 
+  // Immediate mount and transition state to eliminate any blur or slide delay
+  const [isRendered, setIsRendered] = useState(isMobileOpen);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isMobileOpen) {
+      setIsRendered(true);
+      const frame = requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+      return () => cancelAnimationFrame(frame);
+    } else {
+      setIsVisible(false);
+      const timer = setTimeout(() => {
+        setIsRendered(false);
+      }, 260);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobileOpen]);
+
   // Swipe-to-dismiss gesture states
   const [dragOffset, setDragOffset] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -166,21 +186,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <div className="flex flex-col h-full max-h-full bg-white select-none overflow-hidden">
       {/* Mobile Drawer Header with Close Button */}
-      <div className="lg:hidden p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0A3D73] to-[#2589E8] flex items-center justify-center text-amber-300">
+      <div className="lg:hidden h-14 px-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC] shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0A3D73] to-[#2589E8] flex items-center justify-center text-amber-300 shrink-0 shadow-xs">
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
               <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
             </svg>
           </div>
-          <div>
-            <span className="font-extrabold text-xs text-[#0F172A] block leading-none">PLN CORPU</span>
-            <span className="text-[10px] text-[#2589E8] font-bold uppercase">Menu Navigasi</span>
+          <div className="min-w-0">
+            <span className="font-extrabold text-xs text-[#0F172A] block leading-none truncate">PLN CORPU</span>
+            <span className="text-[10px] text-[#2589E8] font-bold uppercase block mt-0.5 truncate">Menu Navigasi</span>
           </div>
         </div>
         <button
           onClick={onCloseMobile}
-          className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-200/80 active:scale-90 transition-all cursor-pointer"
+          className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-200/80 active:scale-90 transition-all cursor-pointer shrink-0"
           aria-label="Tutup Menu"
         >
           <X className="w-5 h-5" />
@@ -336,43 +356,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Slide-Over Drawer with Fluent Backdrop Overlay & Touch Gesture Support */}
-      <div
-        className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
-          isMobileOpen
-            ? 'pointer-events-auto visible opacity-100'
-            : 'pointer-events-none invisible opacity-0 delay-200'
-        }`}
-        aria-hidden={!isMobileOpen}
-      >
-        {/* Backdrop with Frosted Glass Fade */}
+      {/* Mobile Slide-Over Drawer with Zero-Delay Backdrop & Fluid Spring Slide */}
+      {isRendered && (
         <div
-          className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
-            isMobileOpen ? 'opacity-100' : 'opacity-0'
+          className={`fixed inset-0 z-50 lg:hidden overflow-hidden ${
+            isVisible ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
-          onClick={onCloseMobile}
-        />
-
-        {/* Drawer Panel with Fluent Spring/Bezier Easing */}
-        <div
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          style={{
-            transform: isMobileOpen
-              ? `translateX(${dragOffset}px)`
-              : 'translateX(-100%)',
-            transition: isDragging
-              ? 'none'
-              : 'transform 320ms cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-          className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200/80 select-none"
+          aria-hidden={!isVisible}
         >
-          {/* Subtle Pull Indicator / Close Handle on mobile */}
-          <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-10 bg-slate-300/80 rounded-full sm:hidden pointer-events-none" />
-          {sidebarContent}
+          {/* Backdrop with 0ms Delay Frosted Fade */}
+          <div
+            className={`fixed inset-0 bg-slate-950/45 backdrop-blur-xs transition-opacity duration-200 ease-out will-change-[opacity] ${
+              isVisible ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={onCloseMobile}
+          />
+
+          {/* Drawer Panel with Fluent Easing */}
+          <div
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              transform: isVisible
+                ? `translateX(${dragOffset}px)`
+                : 'translateX(-100%)',
+              transition: isDragging
+                ? 'none'
+                : 'transform 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+            className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden"
+          >
+            {sidebarContent}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

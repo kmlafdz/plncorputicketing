@@ -127,16 +127,16 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-xs shrink-0">
+    <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-xs shrink-0 w-full max-w-full overflow-hidden">
       {/* Main Top Header */}
-      <div className="px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+      <div className="w-full px-2.5 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-1.5 sm:gap-3 max-w-full">
         {/* Left: Mobile Toggle & Brand Identity */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 sm:flex-initial">
           {/* Hamburger button for Mobile / Tablet */}
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] active:scale-90 transition-all cursor-pointer focus-ring"
+              className="lg:hidden p-1.5 sm:p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] active:scale-90 transition-all cursor-pointer focus-ring shrink-0"
               aria-label={isMobileMenuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
             >
               <div className={`transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
@@ -147,25 +147,26 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
 
           <button
             onClick={() => onNavigate('dashboard')}
-            className="flex items-center gap-2.5 text-left group cursor-pointer focus-ring rounded-lg p-0.5"
+            className="flex items-center gap-2 sm:gap-2.5 text-left group cursor-pointer focus-ring rounded-lg p-0.5 min-w-0 truncate"
           >
             {/* Stylized PLN Lightning Bolt Emblem */}
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0A3D73] via-[#1765B3] to-[#2589E8] flex items-center justify-center text-amber-300 shadow-sm border border-[#1765B3]/30 group-hover:scale-105 transition-transform shrink-0">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0A3D73] via-[#1765B3] to-[#2589E8] flex items-center justify-center text-amber-300 shadow-sm border border-[#1765B3]/30 group-hover:scale-105 transition-transform shrink-0">
+              <svg className="w-4 h-4 sm:w-6 sm:h-6 fill-current filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24">
                 <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
               </svg>
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-sm sm:text-base tracking-tight text-[#0F172A] leading-tight truncate">
+                <span className="font-extrabold text-xs sm:text-base tracking-tight text-[#0F172A] leading-tight truncate">
                   PLN CORPU
                 </span>
-                <span className="hidden md:inline-block text-[10px] font-bold bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] px-1.5 py-0.2 rounded">
+                <span className="hidden md:inline-block text-[10px] font-bold bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] px-1.5 py-0.2 rounded shrink-0">
                   HELP-DESK
                 </span>
               </div>
-              <span className="text-[10px] font-bold text-[#2589E8] tracking-wider uppercase block truncate">
-                Ticketing Management System
+              <span className="text-[9px] sm:text-[10px] font-bold text-[#2589E8] tracking-wider uppercase block truncate">
+                <span className="hidden sm:inline">Ticketing Management System</span>
+                <span className="sm:hidden">Service Desk</span>
               </span>
             </div>
           </button>
@@ -198,14 +199,14 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
         </div>
 
         {/* Right: Mobile Search Toggle, Notifications & User Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Mobile Search Toggle */}
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
-            className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] transition-colors cursor-pointer"
+            className="md:hidden p-1.5 sm:p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] transition-colors cursor-pointer shrink-0"
             aria-label="Cari tiket"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Notification Bell Dropdown */}
@@ -215,20 +216,20 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 setShowNotifDropdown(!showNotifDropdown);
                 setShowUserDropdown(false);
               }}
-              className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] transition-colors cursor-pointer focus-ring"
+              className="relative p-1.5 sm:p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] transition-colors cursor-pointer focus-ring shrink-0"
               aria-label="Notifikasi"
               aria-expanded={showNotifDropdown}
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-[#2589E8] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white font-mono-numbers shadow-xs animate-in zoom-in-75">
+                <span className="absolute top-1 right-1 min-w-[16px] sm:min-w-[18px] h-4 sm:h-[18px] px-1 bg-[#2589E8] text-white text-[9px] sm:text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white font-mono-numbers shadow-xs animate-in zoom-in-75">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </button>
 
             {showNotifDropdown && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-[#E2E8F0] z-50 overflow-hidden animate-in fade-in-50 duration-200">
+              <div className="absolute right-0 mt-2 w-[calc(100vw-20px)] sm:w-96 max-w-sm bg-white rounded-2xl shadow-xl border border-[#E2E8F0] z-50 overflow-hidden animate-in fade-in-50 duration-200">
                 <div className="p-3.5 bg-[#F8FAFC] border-b border-[#E2E8F0] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-xs text-[#0F172A]">Pemberitahuan</span>
@@ -308,11 +309,11 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
                 setShowUserDropdown(!showUserDropdown);
                 setShowNotifDropdown(false);
               }}
-              className="flex items-center gap-2 p-1 rounded-xl hover:bg-[#F0F7FF] transition-colors cursor-pointer focus-ring"
+              className="flex items-center gap-1.5 p-1 rounded-xl hover:bg-[#F0F7FF] transition-colors cursor-pointer focus-ring shrink-0"
               aria-label="Menu akun pengguna"
               aria-expanded={showUserDropdown}
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0A3D73] to-[#2589E8] text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#0A3D73] to-[#2589E8] text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0">
                 {currentUser.name
                   .split(' ')
                   .map((n) => n[0])
@@ -334,7 +335,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
             </button>
 
             {showUserDropdown && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#E2E8F0] z-50 overflow-hidden py-1.5 animate-in fade-in-50 duration-200">
+              <div className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-20px)] bg-white rounded-2xl shadow-xl border border-[#E2E8F0] z-50 overflow-hidden py-1.5 animate-in fade-in-50 duration-200">
                 <div className="p-3.5 bg-[#F8FAFC] border-b border-[#E2E8F0]">
                   <p className="text-xs font-bold text-[#0F172A]">{currentUser.name}</p>
                   <p className="text-[11px] text-slate-500 font-mono-numbers mt-0.5">{currentUser.employeeId}</p>
