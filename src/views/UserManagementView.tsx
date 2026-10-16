@@ -1235,7 +1235,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                <span className="w-7 h-7 rounded-lg bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] flex items-center justify-center">
                   <PlusCircle className="w-4 h-4" />
                 </span>
                 <h3 className="text-base font-bold text-slate-900">
@@ -1854,7 +1854,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                <span className="w-7 h-7 rounded-lg bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] flex items-center justify-center">
                   <UserIcon className="w-4 h-4" />
                 </span>
                 <h3 className="text-base font-bold text-slate-900">
@@ -1871,7 +1871,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
 
             {/* Profile Header */}
             <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="w-12 h-12 rounded-full bg-emerald-800 text-white flex items-center justify-center font-extrabold text-base">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white flex items-center justify-center font-extrabold text-base shadow-xs">
                 {selectedUser.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -1880,7 +1880,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
                   {renderPicTagBadge(selectedUser)}
                 </div>
                 <p className="text-xs text-slate-500 font-mono-numbers">{selectedUser.employeeId}</p>
-                <p className="text-xs text-emerald-800 font-semibold">{selectedUser.position || selectedUser.department}</p>
+                <p className="text-xs text-[#0A3D73] font-semibold">{selectedUser.position || selectedUser.department}</p>
               </div>
             </div>
 

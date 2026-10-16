@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Ticket as TicketIcon,
   Clock,
@@ -13,10 +13,15 @@ import {
   ClipboardList,
   Wrench,
   User,
+  Users,
+  UserCog,
   HelpCircle,
   FileText,
   Activity,
   Layers,
+  Sparkles,
+  ShieldCheck,
+  ArrowUpRight,
 } from 'lucide-react';
 import { Ticket, User as UserType } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -94,6 +99,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       return new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime();
     })
     .slice(0, 5);
+
+  // Live PIC workloads calculated for Admin Command Center
+  const picWorkloads = useMemo(() => {
+    if (!isAdmin) return [];
+    const pics = [
+      { id: 'user-pic-1', tag: 'PIC 1', name: 'Budi Santoso', team: 'Network & Infrastructure' },
+      { id: 'user-pic-2', tag: 'PIC 2', name: 'Rina Wijaya', team: 'IT Support & Hardware' },
+      { id: 'user-pic-3', tag: 'PIC 3', name: 'Dimas Aditya', team: 'Application Support' },
+    ];
+    return pics.map((p) => {
+      const assigned = tickets.filter((t) => t.currentPicId === p.id);
+      const active = assigned.filter((t) =>
+        ['Ditugaskan', 'Dalam Proses', 'Menunggu Pelapor', 'Menunggu Pihak Ketiga'].includes(t.status)
+      ).length;
+      const done = assigned.filter((t) => ['Selesai', 'Ditutup'].includes(t.status)).length;
+      let load: 'Normal' | 'Sibuk' | 'Penuh' = 'Normal';
+      if (active >= 4) load = 'Penuh';
+      else if (active >= 2) load = 'Sibuk';
+      return { ...p, active, done, total: assigned.length, load };
+    });
+  }, [tickets, isAdmin]);
 
   return (
     <div className="space-y-6">
@@ -219,6 +245,158 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <span className="text-[11px] font-semibold text-[#0A3D73] block mb-1">Kepatuhan SLA</span>
             <span className="text-2xl font-black text-[#2589E8] font-mono-numbers">{slaCompliance}%</span>
             <span className="text-[10px] text-emerald-700 block mt-1 font-semibold">Target tercapai</span>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Operations Command Center */}
+      {isAdmin && (
+        <div className="space-y-4">
+          {/* Triage Alert Banner */}
+          {(unassignedTickets.length > 0 || newTickets > 0) && (
+            <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <span className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <AlertTriangle className="w-5 h-5" />
+                </span>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-amber-950 flex items-center gap-2">
+                    <span>Pusat Triase Admin — Tiket Memerlukan Penugasan Segera</span>
+                    <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2 py-0.5 rounded-full font-mono-numbers">
+                      {unassignedTickets.length} Belum Ada PIC
+                    </span>
+                  </h3>
+                  <p className="text-xs text-amber-800/90 mt-0.5 leading-relaxed font-medium">
+                    Terdapat {newTickets} tiket berstatus Baru dan {unassignedTickets.length} tiket aktif yang belum memiliki petugas PIC. Segera verifikasi laporan dan tugaskan ke tim teknis terkait.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => onNavigate('all-tickets')}
+                className="px-4 py-2.5 bg-gradient-to-r from-[#0A3D73] to-[#1765B3] hover:brightness-110 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap self-stretch sm:self-auto justify-center"
+              >
+                <Wrench className="w-4 h-4 text-amber-300" />
+                <span>Buka Antrean Triase Tiket</span>
+              </button>
+            </div>
+          )}
+
+          {/* Live PIC Capacity & Dispatch Monitor */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
+                  <Wrench className="w-4 h-4 text-[#1765B3]" />
+                  Status Beban Kerja Petugas PIC (Real-Time Dispatch)
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Pantau ketersediaan petugas penanganan sebelum melakukan penugasan tiket baru.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigate('pic-management')}
+                className="text-xs font-bold text-[#2589E8] hover:text-[#1765B3] flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <span>Kelola Detail PIC</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {picWorkloads.map((pic) => (
+                <div
+                  key={pic.id}
+                  onClick={() => onNavigate('pic-management')}
+                  className="p-4 rounded-xl border border-slate-200 bg-[#F8FAFC] hover:bg-white hover:border-[#B8DEFF] hover:shadow-xs transition-all cursor-pointer space-y-3 group"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-bold flex items-center justify-center text-xs shadow-2xs">
+                        {pic.tag}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-slate-900 group-hover:text-[#1765B3] transition-colors">
+                          {pic.name}
+                        </div>
+                        <div className="text-[11px] text-slate-500 font-medium">
+                          {pic.team}
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        pic.load === 'Penuh'
+                          ? 'bg-rose-100 text-rose-800'
+                          : pic.load === 'Sibuk'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {pic.load}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-center pt-1 border-t border-slate-200/60 font-mono-numbers">
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200/80">
+                      <span className="text-[10px] text-slate-400 block font-sans">Beban Aktif</span>
+                      <span className="text-sm font-extrabold text-[#1765B3]">{pic.active} tiket</span>
+                    </div>
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200/80">
+                      <span className="text-[10px] text-slate-400 block font-sans">Selesai</span>
+                      <span className="text-sm font-extrabold text-emerald-700">{pic.done} tuntas</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Admin Command Quick Matrix */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
+            <div>
+              <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
+                <Sparkles className="w-4 h-4 text-[#2589E8]" />
+                Pusat Kontrol & Konfigurasi Helpdesk (Admin)
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Akses cepat modul konfigurasi operasional ticketing PLN Corporate University.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {[
+                { id: 'pic-management', label: 'Manajemen PIC', desc: 'Beban & keahlian', icon: Users, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+                { id: 'auto-assignment', label: 'Auto-Assign', desc: 'Aturan routing tim', icon: Sparkles, color: 'text-amber-600 bg-amber-50 border-amber-200' },
+                { id: 'user-management', label: 'Manajemen User', desc: 'Akun, NIP & Role', icon: UserCog, color: 'text-sky-600 bg-sky-50 border-sky-200' },
+                { id: 'category-management', label: 'Kategori Tiket', desc: 'Kode #TCU-XXXX', icon: Layers, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
+                { id: 'sla-management', label: 'Matriks SLA', desc: 'Target respon/resolusi', icon: Clock, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+                { id: 'audit-log', label: 'Audit Trail', desc: 'Log kepatuhan sistem', icon: ShieldCheck, color: 'text-purple-600 bg-purple-50 border-purple-200' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onNavigate(item.id)}
+                    className="p-3.5 rounded-xl border border-slate-200 bg-[#F8FAFC] hover:bg-white hover:border-[#B8DEFF] hover:shadow-xs transition-all text-left flex flex-col justify-between space-y-2 group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${item.color}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1765B3] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-slate-900 group-hover:text-[#1765B3] transition-colors block leading-tight">
+                        {item.label}
+                      </span>
+                      <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">
+                        {item.desc}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
