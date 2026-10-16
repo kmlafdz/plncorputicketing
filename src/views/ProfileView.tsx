@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Clock,
   Ticket,
+  LogOut,
 } from 'lucide-react';
 import { User as UserType, Ticket as TicketType } from '../types';
 
@@ -15,12 +16,14 @@ interface ProfileViewProps {
   currentUser: UserType;
   tickets: TicketType[];
   onNavigate: (view: string, ticketId?: string) => void;
+  onLogout?: () => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   currentUser,
   tickets,
   onNavigate,
+  onLogout,
 }) => {
   const userTickets = tickets.filter((t) => t.reporterId === currentUser.uid);
   const assignedTickets = tickets.filter((t) => t.currentPicId === currentUser.uid);
@@ -146,6 +149,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             )}
           </div>
         </div>
+
+        {/* Dedicated Account Logout Action Card */}
+        {onLogout && (
+          <div className="pt-2 border-t border-slate-100">
+            <div className="p-4 sm:p-5 bg-rose-50/70 rounded-xl border border-rose-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="space-y-1">
+                <h4 className="text-xs sm:text-sm font-bold text-rose-950 flex items-center gap-1.5">
+                  <LogOut className="w-4 h-4 text-rose-600" />
+                  <span>Keluar dari Akun Kedinasan</span>
+                </h4>
+                <p className="text-[11px] sm:text-xs text-rose-700 leading-relaxed">
+                  Akhiri sesi kerja Anda pada perangkat ini demi menjaga kerahasiaan data tiket dan informasi internal PLN Corporate University.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onLogout}
+                className="w-full sm:w-auto px-4 py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer shrink-0"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Keluar (Logout)</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

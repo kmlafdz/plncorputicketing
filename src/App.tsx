@@ -286,6 +286,7 @@ export default function App() {
                   currentUser={currentUser}
                   tickets={tickets}
                   onNavigate={handleNavigate}
+                  onLogout={handleLogout}
                 />
               )}
 
