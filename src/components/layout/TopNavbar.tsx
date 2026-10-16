@@ -127,7 +127,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-xs">
+    <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-xs shrink-0">
       {/* Main Top Header */}
       <div className="px-3 sm:px-6 py-2.5 flex items-center justify-between gap-3">
         {/* Left: Mobile Toggle & Brand Identity */}

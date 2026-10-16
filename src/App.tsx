@@ -105,7 +105,7 @@ export default function App() {
     .filter((n) => !n.isRead).length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-[#0F172A]">
+    <div className="h-screen w-screen overflow-hidden bg-[#F8FAFC] flex flex-col text-[#0F172A]">
       {/* Top Header */}
       <TopNavbar
         currentUser={currentUser}
@@ -116,7 +116,7 @@ export default function App() {
         onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
       />
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {/* Left Sidebar Navigation */}
         <Sidebar
           currentView={currentView}
@@ -134,7 +134,7 @@ export default function App() {
         />
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-7">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-7 min-h-0 min-w-0 custom-scrollbar">
           {currentView === 'dashboard' && (
             <DashboardView
               tickets={tickets}

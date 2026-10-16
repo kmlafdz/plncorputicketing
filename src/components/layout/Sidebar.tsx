@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white select-none">
+    <div className="flex flex-col h-full max-h-full bg-white select-none overflow-hidden">
       {/* Mobile Drawer Header with Close Button */}
       <div className="lg:hidden p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
         <div className="flex items-center gap-2">
@@ -127,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Scrollable menu content */}
-      <div className="p-3 space-y-4 flex-1 overflow-y-auto">
+      <div className="p-3 space-y-4 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar min-h-0">
         {/* Main Menu */}
         <div>
           <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-400">
@@ -225,7 +225,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* User Info Footer Card */}
-      <div className="p-3 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+      <div className="p-3 border-t border-[#E2E8F0] bg-[#F8FAFC] shrink-0">
         <div className="p-3 bg-white rounded-xl border border-[#E2E8F0] shadow-2xs">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-[#0F172A] truncate">
@@ -271,7 +271,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Persistent Sidebar */}
-      <aside className="hidden lg:flex w-64 border-r border-[#E2E8F0] flex-col shrink-0 min-h-[calc(100vh-65px)]">
+      <aside className="hidden lg:flex w-64 border-r border-[#E2E8F0] flex-col shrink-0 h-full max-h-full overflow-hidden bg-white select-none sticky top-0 self-stretch">
         {sidebarContent}
       </aside>
 
