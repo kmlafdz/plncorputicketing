@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard,
   Ticket,
@@ -49,32 +50,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isPelapor = currentUser.role === 'pelapor';
   const isManajemen = currentUser.role === 'manajemen';
 
-  // Immediate mount and transition state to eliminate any blur or slide delay
-  const [isRendered, setIsRendered] = useState(isMobileOpen);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isMobileOpen) {
-      setIsRendered(true);
-      const frame = requestAnimationFrame(() => {
-        setIsVisible(true);
-      });
-      return () => cancelAnimationFrame(frame);
-    } else {
-      setIsVisible(false);
-      const timer = setTimeout(() => {
-        setIsRendered(false);
-      }, 380);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobileOpen]);
-
-  // Swipe-to-dismiss gesture states
-  const [dragOffset, setDragOffset] = useState<number>(0);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const touchStartXRef = useRef<number>(0);
-  const touchStartTimeRef = useRef<number>(0);
-
   // Lock body scroll when mobile drawer is open to prevent background jitter
   useEffect(() => {
     if (isMobileOpen) {
@@ -97,38 +72,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isMobileOpen, onCloseMobile]);
-
-  // Touch handlers for fluid swipe-to-close gesture
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartTimeRef.current = Date.now();
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - touchStartXRef.current;
-    // Only track drag to the left (negative direction)
-    if (diff < 0) {
-      setDragOffset(diff);
-    } else {
-      setDragOffset(0);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const dragDuration = Date.now() - touchStartTimeRef.current;
-    const isQuickSwipe = dragOffset < -30 && dragDuration < 250;
-    const isDeepDrag = dragOffset < -70;
-
-    if ((isQuickSwipe || isDeepDrag) && onCloseMobile) {
-      onCloseMobile();
-    }
-    setDragOffset(0);
-  };
 
   const handleItemClick = (id: string) => {
     onNavigate(id);
@@ -356,41 +299,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Slide-Over Drawer with Zero-Delay Backdrop & Fluid Spring Slide */}
-      {isRendered && (
-        <div
-          className={`fixed inset-0 z-50 lg:hidden overflow-hidden ${
-            isVisible ? 'pointer-events-auto' : 'pointer-events-none'
-          }`}
-          aria-hidden={!isVisible}
-        >
-          {/* Backdrop with 0ms Delay Frosted Fade */}
+      {/* Mobile Slide-Over Drawer with Pure Spring Physics & Fluid Motion */}
+      <AnimatePresence>
+        {isMobileOpen && (
           <div
-            className={`fixed inset-0 bg-slate-950/45 backdrop-blur-xs transition-opacity duration-320 ease-out will-change-[opacity] ${
-              isVisible ? 'opacity-100' : 'opacity-0'
-            }`}
-            onClick={onCloseMobile}
-          />
-
-          {/* Drawer Panel with Fluent Easing */}
-          <div
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            style={{
-              transform: isVisible
-                ? `translateX(${dragOffset}px)`
-                : 'translateX(-100%)',
-              transition: isDragging
-                ? 'none'
-                : 'transform 380ms cubic-bezier(0.22, 1, 0.36, 1)',
-            }}
-            className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden"
+            className="fixed inset-0 z-50 lg:hidden overflow-hidden pointer-events-auto"
+            aria-modal="true"
+            role="dialog"
           >
-            {sidebarContent}
+            {/* Smooth Backdrop Fade */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28, ease: 'easeOut' }}
+              onClick={onCloseMobile}
+              className="fixed inset-0 bg-slate-950/45 will-change-[opacity]"
+            />
+
+            {/* Fluent Spring Physics Drawer Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: '0%' }}
+              exit={{ x: '-100%' }}
+              transition={{
+                type: 'spring',
+                damping: 32,
+                stiffness: 320,
+                mass: 0.8,
+              }}
+              drag="x"
+              dragConstraints={{ left: -320, right: 0 }}
+              dragElastic={{ left: 0.08, right: 0.01 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -60 || info.velocity.x < -250) {
+                  onCloseMobile?.();
+                }
+              }}
+              className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden touch-pan-y"
+            >
+              {sidebarContent}
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   );
 };
