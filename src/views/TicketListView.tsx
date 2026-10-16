@@ -201,25 +201,25 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
     'my-assignments': 'Daftar tiket yang ditugaskan kepada Anda untuk ditangani dan diselesaikan.',
   }[mode];
 
-  return (
+    return (
     <div className="space-y-4">
       {/* Page Title & Top CTA Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E2E8F0] shadow-xs">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">{pageTitle}</h1>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0F172A] tracking-tight font-heading">{pageTitle}</h1>
           <p className="text-xs text-slate-500 mt-1">{pageSubtitle}</p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center gap-2 shadow-2xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-[#E2E8F0] rounded-xl hover:bg-[#F8FAFC] flex items-center justify-center gap-2 shadow-2xs transition-colors cursor-pointer focus-ring"
           >
             <Download className="w-4 h-4 text-slate-500" />
             <span>Ekspor CSV</span>
           </button>
           <button
             onClick={() => onNavigate('create-ticket')}
-            className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-initial px-4 py-2 text-xs font-bold text-white bg-gradient-primary hover:opacity-95 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer focus-ring"
           >
             <PlusCircle className="w-4 h-4" />
             <span>+ Buat Tiket Baru</span>
@@ -228,8 +228,8 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
       </div>
 
       {/* Tabs Filter */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-        <div className="flex items-center border-b border-slate-200 overflow-x-auto px-4 gap-1 py-1 bg-slate-50/60">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div className="flex items-center border-b border-[#E2E8F0] overflow-x-auto px-4 gap-1 py-1.5 bg-[#F8FAFC]">
           {(mode === 'my-assignments'
             ? [
                 { id: 'all', label: 'Semua Penugasan Saya', count: tabCounts.all },
@@ -259,14 +259,14 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                 }}
                 className={`flex items-center gap-2 py-2 px-3 text-xs font-semibold transition-all border-b-2 whitespace-nowrap cursor-pointer ${
                   isTabActive
-                    ? 'border-emerald-700 text-emerald-800 bg-emerald-50/60 rounded-t-lg'
-                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg'
+                    ? 'border-[#2589E8] text-[#0A3D73] bg-[#EFF8FF] rounded-t-lg'
+                    : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 rounded-lg'
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono-numbers ${
-                    isTabActive ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'
+                    isTabActive ? 'bg-[#2589E8] text-white shadow-2xs' : 'bg-slate-200 text-slate-700'
                   }`}
                 >
                   {tab.count}
@@ -276,8 +276,8 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
           })}
         </div>
 
-        {/* Filter Toolbar (Inspired by Image 2: Add Filter, Priority, Status, Search, Reset) */}
-        <div className="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-white">
+        {/* Filter Toolbar */}
+        <div className="p-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 bg-white">
           <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
             {/* Priority Filter */}
             <div className="flex items-center gap-1.5">
@@ -288,7 +288,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                   setSelectedPriority(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 font-medium"
+                className="text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2589E8] font-medium"
               >
                 <option value="ALL">Semua Prioritas</option>
                 <option value="Kritis">Kritis</option>
@@ -307,7 +307,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                   setSelectedCategory(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 font-medium max-w-[160px] truncate"
+                className="text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2589E8] font-medium max-w-[160px] truncate"
               >
                 <option value="ALL">Semua Kategori</option>
                 {categoryNames.map((cat) => (
@@ -327,7 +327,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                   setSelectedStatus(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 font-medium"
+                className="text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#2589E8] font-medium"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="Baru">Baru</option>
@@ -351,7 +351,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
               searchQuery) && (
               <button
                 onClick={handleResetFilters}
-                className="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-rose-50 transition-colors cursor-pointer"
+                className="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -368,10 +368,19 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Cari tiket di sini..."
-              className="w-full pl-8 pr-4 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:bg-white text-slate-800"
+              placeholder="Cari nomor atau judul tiket..."
+              className="w-full pl-8 pr-7 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2589E8] focus:bg-white text-slate-800 font-medium"
             />
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1.5 text-slate-400 hover:text-slate-700 text-xs w-5 h-5 flex items-center justify-center rounded-full"
+              >
+                ×
+              </button>
+            )}
           </div>
         </div>
 
@@ -379,24 +388,24 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
         <div className="overflow-x-auto">
           {filteredTickets.length === 0 ? (
             <div className="py-16 text-center">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400 mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#F0F7FF] flex items-center justify-center mx-auto text-[#2589E8] mb-3">
                 <Search className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">Tidak ada tiket ditemukan</h3>
+              <h3 className="text-sm font-bold text-slate-800 font-heading">Tidak ada tiket ditemukan</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
                 Kriteria pencarian atau filter Anda tidak cocok dengan tiket yang ada saat ini.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-4 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer"
+                className="mt-4 px-3.5 py-1.5 text-xs font-semibold text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF] rounded-lg hover:bg-[#D9EEFF] transition-colors cursor-pointer"
               >
                 Reset Semua Filter
               </button>
             </div>
           ) : (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                   <th className="py-3 px-4">Nomor Tiket</th>
                   <th className="py-3 px-4">Subjek Kendala</th>
                   <th className="py-3 px-4">Prioritas</th>
@@ -415,21 +424,21 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                     <tr
                       key={ticket.id}
                       onClick={() => onNavigate('ticket-detail', ticket.id)}
-                      className="hover:bg-slate-50/90 transition-colors cursor-pointer group"
+                      className="hover:bg-[#F8FAFC] transition-colors cursor-pointer group"
                     >
                       {/* Ticket Number */}
-                      <td className="py-3.5 px-4 font-mono-numbers font-bold text-emerald-800 whitespace-nowrap">
+                      <td className="py-3.5 px-4 font-mono-numbers font-bold text-[#1765B3] whitespace-nowrap">
                         #{ticket.ticketNumber}
                       </td>
 
                       {/* Subject & Type */}
                       <td className="py-3.5 px-4 max-w-xs">
-                        <div className="font-semibold text-slate-900 group-hover:text-emerald-800 transition-colors truncate">
+                        <div className="font-semibold text-[#0F172A] group-hover:text-[#2589E8] transition-colors truncate">
                           {ticket.title}
                         </div>
-                        <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5 mt-0.5">
+                        <div className="text-[11px] text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
                           {ticket.categoryCode && (
-                            <span className="font-mono text-[10px] font-bold text-[#1765B3] bg-[#EFF8FF] border border-[#B8DEFF] px-1.5 py-0.2 rounded shrink-0">
+                            <span className="font-mono text-[10px] font-bold text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF] px-1.5 py-0.2 rounded shrink-0">
                               {ticket.categoryCode}
                             </span>
                           )}
@@ -448,7 +457,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         {ticket.currentPicName ? (
                           <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold flex items-center justify-center shrink-0 border border-amber-300">
+                            <div className="w-6 h-6 rounded-full bg-[#EFF8FF] text-[#1765B3] text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#B8DEFF]">
                               {ticket.currentPicName.charAt(0)}
                             </div>
                             <span className="font-semibold text-slate-800 truncate max-w-[150px]">
@@ -462,10 +471,10 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
 
                       {/* Reporter & Department */}
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-slate-900 truncate max-w-[130px]">
+                        <div className="font-semibold text-[#0F172A] truncate max-w-[130px]">
                           {ticket.reporterName}
                         </div>
-                        <div className="text-[11px] text-slate-400 truncate max-w-[140px]">
+                        <div className="text-[11px] text-slate-500 truncate max-w-[140px]">
                           {ticket.department}
                         </div>
                       </td>
@@ -508,7 +517,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                             e.stopPropagation();
                             onNavigate('ticket-detail', ticket.id);
                           }}
-                          className="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-100 hover:text-emerald-800 shadow-2xs transition-colors cursor-pointer"
+                          className="px-3 py-1.5 text-xs font-semibold text-[#0A3D73] bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#EFF8FF] hover:border-[#B8DEFF] shadow-2xs transition-colors cursor-pointer"
                         >
                           Kelola
                         </button>
@@ -521,18 +530,18 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
           )}
         </div>
 
-        {/* Pagination Footer (Matching uploaded Image 2: Showing X tickets, Previous, 1, 2, 3..., Next) */}
-        <div className="p-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+        {/* Pagination Footer */}
+        <div className="p-4 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#F8FAFC]">
           <div className="text-xs text-slate-500 font-mono-numbers">
-            Menampilkan <span className="font-bold text-slate-800">{paginatedTickets.length}</span> dari{' '}
-            <span className="font-bold text-slate-800">{filteredTickets.length}</span> tiket
+            Menampilkan <span className="font-bold text-[#0F172A]">{paginatedTickets.length}</span> dari{' '}
+            <span className="font-bold text-[#0F172A]">{filteredTickets.length}</span> tiket
           </div>
 
           <div className="flex items-center gap-1">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#E2E8F0] text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -541,9 +550,9 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-7 h-7 rounded-lg text-xs font-semibold font-mono-numbers cursor-pointer ${
+                className={`w-7 h-7 rounded-lg text-xs font-semibold font-mono-numbers cursor-pointer transition-colors ${
                   currentPage === page
-                    ? 'bg-emerald-700 text-white shadow-2xs'
+                    ? 'bg-[#2589E8] text-white shadow-xs'
                     : 'text-slate-600 hover:bg-white hover:border border-slate-200'
                 }`}
               >
@@ -554,7 +563,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#E2E8F0] text-slate-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -563,4 +572,4 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
       </div>
     </div>
   );
-};
+};;

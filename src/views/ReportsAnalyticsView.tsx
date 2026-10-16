@@ -154,7 +154,7 @@ export const ReportsAnalyticsView: React.FC<ReportsAnalyticsViewProps> = ({
 
           <button
             onClick={handleExportReportCSV}
-            className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 bg-[#1765B3] hover:bg-[#0A3D73] text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <Download className="w-4 h-4" />
             <span>Unduh Laporan CSV</span>

@@ -15,6 +15,7 @@ import {
   ArrowRight,
   CheckCircle2,
   UserCog,
+  Check,
 } from 'lucide-react';
 import { User as UserType } from '../types';
 import { authService } from '../services/authService';
@@ -30,16 +31,20 @@ interface DemoAccount {
   password: string;
   icon: 'admin' | 'pelapor' | 'pic' | 'manajemen' | 'user_management';
   description: string;
+  badge: string;
+  badgeColor: string;
 }
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
   {
     label: 'Admin Ticketing',
-    roleTitle: 'Administrator',
+    roleTitle: 'Administrator Helpdesk',
     username: 'admin',
     password: 'admin123',
     icon: 'admin',
     description: 'Verifikasi, Disposisi PIC, SLA & Laporan',
+    badge: 'ADMIN',
+    badgeColor: 'bg-[#EFF8FF] text-[#0A3D73] border-[#B8DEFF]',
   },
   {
     label: 'Manajemen CorpU',
@@ -48,14 +53,18 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     password: 'manajemen123',
     icon: 'manajemen',
     description: 'Executive Dashboard, KPI & Rekap SLA',
+    badge: 'MANAJEMEN',
+    badgeColor: 'bg-purple-50 text-purple-900 border-purple-200',
   },
   {
     label: 'Pelapor (Andi)',
-    roleTitle: 'Pelapor / User',
+    roleTitle: 'Pelapor / Pegawai',
     username: 'andi',
     password: 'user123',
     icon: 'pelapor',
     description: 'Buat Tiket & Pantau Status Pengajuan',
+    badge: 'PELAPOR',
+    badgeColor: 'bg-sky-50 text-sky-900 border-sky-200',
   },
   {
     label: 'PIC 1 (Budi Santoso)',
@@ -63,7 +72,9 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     username: 'budi',
     password: 'pic123',
     icon: 'pic',
-    description: 'PIC 1 · Network & Infrastructure',
+    description: 'Network & IT Infrastructure',
+    badge: 'PIC NETWORK',
+    badgeColor: 'bg-blue-50 text-blue-900 border-blue-200',
   },
   {
     label: 'PIC 2 (Rina Wijaya)',
@@ -71,7 +82,9 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     username: 'rina',
     password: 'pic123',
     icon: 'pic',
-    description: 'PIC 2 · IT Support & Hardware',
+    description: 'IT Support & Hardware',
+    badge: 'PIC HARDWARE',
+    badgeColor: 'bg-amber-50 text-amber-900 border-amber-200',
   },
   {
     label: 'PIC 3 (Dimas Aditya)',
@@ -79,15 +92,19 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     username: 'dimas',
     password: 'pic123',
     icon: 'pic',
-    description: 'PIC 3 · Application Support & LMS',
+    description: 'Application Support & LMS',
+    badge: 'PIC APLIKASI',
+    badgeColor: 'bg-emerald-50 text-emerald-900 border-emerald-200',
   },
   {
     label: 'Manajemen User',
-    roleTitle: 'Administrator Pengguna & Hak Akses',
+    roleTitle: 'Admin Akun & Hak Akses',
     username: 'admin_user',
     password: 'admin123',
     icon: 'user_management',
-    description: 'Akses Kelola Akun, NIP, Role Pengguna & Status Keaktifan',
+    description: 'Kelola Pengguna, Akun NIP, Role & Keaktifan Sistem',
+    badge: 'USER ADMIN',
+    badgeColor: 'bg-indigo-50 text-indigo-900 border-indigo-200',
   },
 ];
 
@@ -123,64 +140,61 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     await executeLogin(identifier, password);
   };
 
-  const handleSelectAccount = (acc: DemoAccount, autoSubmit = false) => {
+  const handleSelectAccount = (acc: DemoAccount) => {
     setIdentifier(acc.username);
     setPassword(acc.password);
     setSelectedDemo(acc.username);
     setErrorMessage(null);
-
-    if (autoSubmit) {
-      executeLogin(acc.username, acc.password);
-    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-emerald-50/30 to-slate-100 flex flex-col justify-center items-center py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#F0F7FF] via-[#F8FAFC] to-[#EFF8FF] flex flex-col justify-center items-center py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-xl w-full space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-2.5">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#005160] text-amber-300 shadow-md border-2 border-[#003d49]">
-            <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24">
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0A3D73] via-[#1765B3] to-[#2589E8] text-amber-300 shadow-md border border-[#1765B3]/30">
+            <svg className="w-8 h-8 fill-current filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" viewBox="0 0 24 24">
               <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
             </svg>
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-emerald-950 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0F172A] tracking-tight font-heading">
               PLN CORPORATE UNIVERSITY
             </h1>
-            <p className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 mt-0.5">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#2589E8] mt-0.5">
               TICKETING MANAGEMENT SYSTEM
             </p>
           </div>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
-            Sistem Informasi Pelayanan & Pengelolaan Insiden, Keluhan, dan Permintaan Layanan Terpadu
+          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            Portal Layanan Terpadu Penanganan Insiden, Keluhan, dan Permintaan Dukungan TI & Pembelajaran
           </p>
         </div>
 
         {/* Main Login Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xl space-y-5">
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E2E8F0] shadow-xl space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Masuk ke Portal Layanan</h2>
+              <h2 className="text-sm font-bold text-[#0F172A]">Masuk ke Portal Layanan</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Masukkan kredensial atau pilih akun pengujian di bawah ini
+                Gunakan kredensial Anda atau pilih salah satu akun pengujian
               </p>
             </div>
-            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-bold rounded-md border border-emerald-200 uppercase">
-              Auth v2.0
+            <span className="px-2.5 py-1 bg-[#EFF8FF] text-[#0A3D73] border border-[#B8DEFF] text-[10px] font-bold rounded-full uppercase shadow-2xs">
+              Sistem Aktif
             </span>
           </div>
 
-          {/* Quick Demo Account Selector (1-Click Fill & Instant Login) */}
-          <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-200 space-y-2">
+          {/* Quick Demo Account Selector (Autofill) */}
+          <div className="bg-[#F8FAFC] rounded-xl p-3 border border-[#E2E8F0] space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 Pilih Akun Demo (Klik untuk Isi Formulir):
               </span>
-              <span className="text-[10px] text-slate-400">Siap Digunakan</span>
+              <span className="text-[10px] text-slate-400 font-medium">1-Klik Pilih</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {DEMO_ACCOUNTS.map((acc) => {
                 const isSelected = selectedDemo === acc.username;
                 const isFullWidth = acc.icon === 'user_management';
@@ -188,50 +202,43 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   <button
                     key={acc.username}
                     type="button"
-                    onClick={() => handleSelectAccount(acc, false)}
-                    className={`p-2 rounded-lg text-left border transition-all cursor-pointer flex flex-col justify-between ${
-                      isFullWidth ? 'col-span-2 sm:col-span-3 bg-gradient-to-r from-teal-50/90 to-emerald-50/70 border-teal-300' : ''
+                    onClick={() => handleSelectAccount(acc)}
+                    className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
+                      isFullWidth ? 'sm:col-span-2' : ''
                     } ${
                       isSelected
-                        ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500 shadow-2xs'
-                        : isFullWidth
-                        ? 'border-teal-300 hover:border-teal-500 hover:bg-teal-50'
-                        : 'bg-white border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/30'
+                        ? 'bg-[#EFF8FF] border-[#2589E8] ring-2 ring-[#2589E8]/30 shadow-xs'
+                        : 'bg-white border-[#E2E8F0] hover:border-[#B8DEFF] hover:bg-[#F0F7FF]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full mb-1">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
                         {acc.icon === 'admin' ? (
-                          <Shield className="w-3.5 h-3.5 text-emerald-700" />
+                          <Shield className="w-4 h-4 text-[#1765B3] shrink-0" />
                         ) : acc.icon === 'manajemen' ? (
-                          <Briefcase className="w-3.5 h-3.5 text-purple-700" />
+                          <Briefcase className="w-4 h-4 text-purple-600 shrink-0" />
                         ) : acc.icon === 'pic' ? (
-                          <Wrench className="w-3.5 h-3.5 text-amber-600" />
+                          <Wrench className="w-4 h-4 text-amber-600 shrink-0" />
                         ) : acc.icon === 'user_management' ? (
-                          <UserCog className="w-4 h-4 text-teal-700" />
+                          <UserCog className="w-4 h-4 text-indigo-600 shrink-0" />
                         ) : (
-                          <User className="w-3.5 h-3.5 text-sky-600" />
+                          <User className="w-4 h-4 text-sky-600 shrink-0" />
                         )}
-                        <span className="text-[11px] font-bold text-slate-900 truncate">
+                        <span className="text-xs font-bold text-[#0F172A] truncate">
                           {acc.label}
                         </span>
-                        {isFullWidth && (
-                          <span className="text-[9px] bg-teal-100 text-teal-900 font-extrabold px-1.5 py-0.2 rounded border border-teal-200">
-                            Akses Pengguna & Akun
-                          </span>
-                        )}
                       </div>
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
-                    </div>
-                    <div className="flex items-center justify-between w-full text-[10px] text-slate-500">
-                      <span>
-                        user: <strong className="text-slate-700">{acc.username}</strong>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${acc.badgeColor} shrink-0`}>
+                        {acc.badge}
                       </span>
-                      {isFullWidth && (
-                        <span className="text-teal-800 font-semibold hidden sm:inline text-[10px]">
-                          {acc.description}
-                        </span>
-                      )}
+                    </div>
+                    <div className="flex items-center justify-between w-full text-[10px] text-slate-500 mt-1">
+                      <span className="font-mono-numbers">
+                        user: <strong className="text-slate-800">{acc.username}</strong>
+                      </span>
+                      <span className="text-slate-400 truncate max-w-[170px] text-right font-medium">
+                        {acc.description}
+                      </span>
                     </div>
                   </button>
                 );
@@ -246,7 +253,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               <div className="space-y-1">
                 <span className="leading-relaxed font-semibold">{errorMessage}</span>
                 <p className="text-[11px] text-rose-700">
-                  Tip: Klik salah satu tombol akun di atas untuk mengisi kredensial valid secara instan.
+                  Tip: Klik salah satu kartu akun di atas untuk mengisi kredensial valid secara instan.
                 </p>
               </div>
             </div>
@@ -255,11 +262,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email / Username Input */}
             <div>
-              <label className="block text-xs font-bold text-slate-800 mb-1.5">
-                Email / Username / NIP
+              <label htmlFor="login-identifier" className="block text-xs font-bold text-slate-800 mb-1.5">
+                Username / Email / NIP
               </label>
               <div className="relative">
                 <input
+                  id="login-identifier"
                   type="text"
                   required
                   autoComplete="username"
@@ -269,8 +277,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     setIdentifier(e.target.value);
                     setSelectedDemo('');
                   }}
-                  placeholder="Contoh: admin atau andi"
-                  className="w-full text-xs pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:bg-white text-slate-900 placeholder:text-slate-400 font-medium disabled:opacity-50"
+                  placeholder="Contoh: admin, manajemen, atau andi"
+                  className="w-full text-xs pl-9 pr-3 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2589E8] focus:bg-white text-[#0F172A] placeholder:text-slate-400 font-medium disabled:opacity-50 transition-all"
                 />
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
               </div>
@@ -279,15 +287,16 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             {/* Password Input with show/hide */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-800">
+                <label htmlFor="login-password" className="block text-xs font-bold text-slate-800">
                   Password Akun
                 </label>
-                <span className="text-[11px] text-emerald-700 font-medium">
+                <span className="text-[11px] text-[#2589E8] font-medium font-mono-numbers">
                   Default: {password || 'admin123'}
                 </span>
               </div>
               <div className="relative">
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   autoComplete="current-password"
@@ -295,30 +304,27 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password akun Anda"
-                  className="w-full text-xs pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:bg-white text-slate-900 placeholder:text-slate-400 font-medium disabled:opacity-50"
+                  className="w-full text-xs pl-9 pr-10 py-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2589E8] focus:bg-white text-[#0F172A] placeholder:text-slate-400 font-medium disabled:opacity-50 transition-all"
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                 <button
                   type="button"
                   tabIndex={-1}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer focus:outline-hidden"
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-none p-0.5"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">
-                Catatan: Dalam mode demo ini, Anda juga dapat memasukkan password apa saja.
-              </p>
             </div>
 
             {/* Submit Action Buttons */}
-            <div className="pt-1 space-y-2">
+            <div className="pt-2 space-y-3">
               <button
                 type="submit"
                 disabled={isLoading}
-                style={{ backgroundColor: '#00537a' }}
-                className="w-full py-2.5 px-4 hover:brightness-110 disabled:opacity-60 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-[#0A3D73] via-[#1765B3] to-[#2589E8] hover:opacity-95 disabled:opacity-60 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer focus-ring"
               >
                 {isLoading ? (
                   <>
@@ -334,18 +340,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               </button>
 
               {/* Quick 1-Click Login Shortcuts */}
-              <div className="space-y-1.5 pt-1">
+              <div className="space-y-2 pt-2 border-t border-slate-100">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block text-center">
-                  Akses Cepat 1-Klik Akun Demo
+                  Akses Cepat 1-Klik Masuk Langsung
                 </span>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                   <button
                     type="button"
                     disabled={isLoading}
                     onClick={() => executeLogin('admin', 'admin123')}
-                    className="py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px] rounded-lg border border-emerald-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    className="py-1.5 px-2 bg-[#EFF8FF] hover:bg-[#D9EEFF] text-[#0A3D73] font-bold text-[11px] rounded-lg border border-[#B8DEFF] transition-colors flex items-center justify-center gap-1 cursor-pointer"
                   >
-                    <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                    <ShieldCheck className="w-3 h-3 text-[#1765B3]" />
                     <span>Admin</span>
                   </button>
 
@@ -363,10 +369,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     type="button"
                     disabled={isLoading}
                     onClick={() => executeLogin('andi', 'user123')}
-                    className="py-1.5 px-2 bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-[11px] rounded-lg border border-sky-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                    className="py-1.5 px-2 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-[11px] rounded-lg border border-sky-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                   >
-                    <User className="w-3 h-3 text-sky-600" />
-                    <span>Pelapor (Andi)</span>
+                    <User className="w-3 h-3 text-sky-700" />
+                    <span>Pelapor</span>
                   </button>
 
                   <button
@@ -376,37 +382,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     className="py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-[11px] rounded-lg border border-amber-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <Wrench className="w-3 h-3 text-amber-700" />
-                    <span>PIC 1 (Budi Santoso)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => executeLogin('rina', 'pic123')}
-                    className="py-1.5 px-2 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-[11px] rounded-lg border border-blue-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Wrench className="w-3 h-3 text-blue-700" />
-                    <span>PIC 2 (Rina Wijaya)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => executeLogin('dimas', 'pic123')}
-                    className="py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-[11px] rounded-lg border border-emerald-200 transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <Wrench className="w-3 h-3 text-emerald-700" />
-                    <span>PIC 3 (Dimas Aditya)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => executeLogin('admin_user', 'admin123')}
-                    className="py-1.5 px-2 bg-teal-50 hover:bg-teal-100 text-teal-950 font-bold text-[11px] rounded-lg border border-teal-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer col-span-2 sm:col-span-3"
-                  >
-                    <UserCog className="w-3.5 h-3.5 text-teal-700" />
-                    <span>Manajemen User (Akses Pengguna & Akun)</span>
+                    <span>PIC 1</span>
                   </button>
                 </div>
               </div>
@@ -414,13 +390,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </form>
         </div>
 
-        {/* Security & Copyright info */}
-        <div className="text-center text-[11px] text-slate-400 space-y-1">
-          <p className="flex items-center justify-center gap-1 font-medium text-slate-500">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-            Koneksi Terenkripsi · Sesi Terautentikasi PLN CorpU
+        {/* Security & Copyright footer */}
+        <div className="text-center text-[11px] text-slate-500 space-y-1">
+          <p className="flex items-center justify-center gap-1.5 font-medium">
+            <ShieldCheck className="w-4 h-4 text-[#2589E8]" />
+            <span>Koneksi Aman Terenkripsi · Sesi Terautentikasi PLN Corporate University</span>
           </p>
-          <p>© 2026 PLN Corporate University. Hak Cipta Dilindungi.</p>
+          <p className="text-slate-400">© 2026 PT PLN (Persero) Corporate University. Seluruh hak cipta dilindungi.</p>
         </div>
       </div>
     </div>

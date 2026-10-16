@@ -1406,7 +1406,7 @@ export const UserManagementView: React.FC<UserManagementViewProps> = ({ currentU
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-emerald-700 text-white font-bold rounded-lg hover:bg-emerald-800 cursor-pointer shadow-xs"
+                    className="px-4 py-2 bg-gradient-to-r from-[#0A3D73] to-[#1765B3] hover:brightness-110 text-white font-bold rounded-lg cursor-pointer shadow-xs transition-all"
                   >
                     Simpan Pengguna
                   </button>

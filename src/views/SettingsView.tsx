@@ -58,7 +58,7 @@ export const SettingsView: React.FC = () => {
       {/* System Identity Card */}
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-          <Server className="w-4 h-4 text-emerald-700" />
+          <Server className="w-4 h-4 text-[#1765B3]" />
           Identitas & Lingkungan Sistem
         </h2>
 
@@ -88,7 +88,7 @@ export const SettingsView: React.FC = () => {
       {/* Data Management & Backup */}
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
         <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
-          <Database className="w-4 h-4 text-emerald-700" />
+          <Database className="w-4 h-4 text-[#1765B3]" />
           Pengelolaan & Cadangan Data
         </h2>
 

@@ -86,7 +86,7 @@ export const NotificationView: React.FC<NotificationViewProps> = ({
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="text-xs text-emerald-700 hover:text-emerald-900 font-bold cursor-pointer"
+              className="text-xs text-[#1765B3] hover:text-[#0A3D73] font-bold cursor-pointer transition-colors"
             >
               Tandai Semua Dibaca
             </button>
@@ -108,14 +108,14 @@ export const NotificationView: React.FC<NotificationViewProps> = ({
               key={notif.id}
               onClick={() => handleClick(notif)}
               className={`p-4 flex items-start justify-between gap-4 hover:bg-slate-50 transition-colors cursor-pointer ${
-                !notif.isRead ? 'bg-emerald-50/40' : ''
+                !notif.isRead ? 'bg-[#EFF8FF]/70' : ''
               }`}
             >
               <div className="flex items-start gap-3.5">
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
                     notif.type === 'assignment'
-                      ? 'bg-sky-100 text-sky-700'
+                      ? 'bg-sky-100 text-[#1765B3]'
                       : notif.type === 'sla'
                       ? 'bg-rose-100 text-rose-700'
                       : notif.type === 'comment'
@@ -133,7 +133,7 @@ export const NotificationView: React.FC<NotificationViewProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-900 text-xs">{notif.title}</span>
                     {!notif.isRead && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+                      <span className="w-2 h-2 rounded-full bg-[#1765B3] shrink-0" />
                     )}
                     {notif.ticketNumber && (
                       <span className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded font-mono-numbers font-semibold">

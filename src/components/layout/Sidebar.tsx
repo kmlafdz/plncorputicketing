@@ -16,6 +16,7 @@ import {
   User,
   LogOut,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { User as UserType } from '../../types';
 
@@ -30,6 +31,8 @@ interface SidebarProps {
     notifications: number;
   };
   onLogout: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -38,11 +41,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentUser,
   counts,
   onLogout,
+  isMobileOpen = false,
+  onCloseMobile,
 }) => {
   const isAdmin = currentUser.role === 'admin';
   const isPic = currentUser.role === 'pic';
   const isPelapor = currentUser.role === 'pelapor';
   const isManajemen = currentUser.role === 'manajemen';
+
+  const handleItemClick = (id: string) => {
+    onNavigate(id);
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
+  };
 
   const navItem = (
     id: string,
@@ -54,17 +66,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
       <button
         key={id}
-        onClick={() => onNavigate(id)}
-        className={`w-full flex items-center justify-between px-3 py-2 rounded-r-lg text-xs transition-all group cursor-pointer relative ${
+        onClick={() => handleItemClick(id)}
+        aria-current={isActive ? 'page' : undefined}
+        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all group cursor-pointer relative ${
           isActive
-            ? 'bg-[#E5F2FF] text-[#1765B3] font-bold border-l-4 border-[#2589E8]'
-            : 'text-[#64748B] hover:text-[#172B4D] hover:bg-[#F0F7FF] border-l-4 border-transparent'
+            ? 'bg-[#EFF8FF] text-[#0A3D73] font-bold shadow-2xs'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-[#F8FAFC]'
         }`}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className={`w-1.5 h-4 rounded-full transition-all shrink-0 ${
+              isActive ? 'bg-[#2589E8]' : 'bg-transparent group-hover:bg-slate-300'
+            }`}
+          />
           <Icon
             className={`w-4 h-4 shrink-0 transition-colors ${
-              isActive ? 'text-[#2589E8]' : 'text-[#94A3B8] group-hover:text-[#2589E8]'
+              isActive ? 'text-[#2589E8]' : 'text-slate-400 group-hover:text-slate-600'
             }`}
           />
           <span className="truncate">{label}</span>
@@ -73,8 +91,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono-numbers shrink-0 transition-colors ${
               isActive
-                ? 'bg-[#2589E8] text-white shadow-2xs'
-                : 'bg-[#EFF8FF] text-[#1765B3] border border-[#DCEAF7]'
+                ? 'bg-[#2589E8] text-white shadow-xs'
+                : 'bg-slate-100 text-slate-700 border border-slate-200'
             }`}
           >
             {badgeCount}
@@ -84,13 +102,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  return (
-    <aside className="w-64 bg-white border-r border-[#DCEAF7] flex flex-col shrink-0 min-h-[calc(100vh-65px)] select-none">
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-white select-none">
+      {/* Mobile Drawer Header with Close Button */}
+      <div className="lg:hidden p-4 border-b border-[#E2E8F0] flex items-center justify-between bg-[#F8FAFC]">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0A3D73] to-[#2589E8] flex items-center justify-center text-amber-300">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z" />
+            </svg>
+          </div>
+          <div>
+            <span className="font-extrabold text-xs text-[#0F172A] block leading-none">PLN CORPU</span>
+            <span className="text-[10px] text-[#2589E8] font-bold uppercase">Menu Navigasi</span>
+          </div>
+        </div>
+        <button
+          onClick={onCloseMobile}
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 cursor-pointer"
+          aria-label="Tutup Menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
       {/* Scrollable menu content */}
-      <div className="p-3 space-y-5 flex-1 overflow-y-auto">
+      <div className="p-3 space-y-4 flex-1 overflow-y-auto">
         {/* Main Menu */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-[#94A3B8]">
+          <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-400">
             Menu Utama
           </div>
           <div className="space-y-0.5">
@@ -124,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </>
             )}
 
-            {/* Notifications for all authenticated users */}
+            {/* Notifications */}
             {navItem('notifications', 'Notifikasi', Bell, counts.notifications)}
           </div>
         </div>
@@ -132,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Management & Helpdesk Menu (Admin only) */}
         {isAdmin && (
           <div>
-            <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-[#94A3B8]">
+            <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-400">
               Pengelolaan & Helpdesk
             </div>
             <div className="space-y-0.5">
@@ -148,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Reports & Audit (Admin & Manajemen) */}
         {(isAdmin || isManajemen) && (
           <div>
-            <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-[#94A3B8]">
+            <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-400">
               {isManajemen ? 'Pengawasan & Kepatuhan' : 'Laporan & Kepatuhan'}
             </div>
             <div className="space-y-0.5">
@@ -161,17 +201,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* System Settings */}
         <div>
-          <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-[#94A3B8]">
+          <div className="px-3 pb-1.5 text-[10px] font-bold tracking-wider uppercase text-slate-400">
             Sistem & Akun
           </div>
           <div className="space-y-0.5">
             {navItem('profile', 'Profil Pengguna', User)}
             {isAdmin && navItem('settings', 'Pengaturan Aplikasi', Settings)}
             <button
-              onClick={onLogout}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-r-lg text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50/70 transition-colors group cursor-pointer border-l-4 border-transparent"
+              onClick={() => {
+                if (onCloseMobile) onCloseMobile();
+                onLogout();
+              }}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors group cursor-pointer"
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
+                <span className="w-1.5 h-4 rounded-full bg-transparent" />
                 <LogOut className="w-4 h-4 text-rose-400 group-hover:text-rose-600" />
                 <span>Keluar (Logout)</span>
               </div>
@@ -180,21 +224,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* User Info Footer card */}
-      <div className="p-3 border-t border-[#DCEAF7] bg-[#F5FAFF]">
-        <div className="p-2.5 bg-white rounded-lg border border-[#DCEAF7] shadow-2xs">
+      {/* User Info Footer Card */}
+      <div className="p-3 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+        <div className="p-3 bg-white rounded-xl border border-[#E2E8F0] shadow-2xs">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] font-bold text-[#172B4D] truncate">
+            <span className="text-xs font-bold text-[#0F172A] truncate">
               {currentUser.name}
             </span>
             <span
-              className={`text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded ${
+              className={`text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded shadow-2xs ${
                 isAdmin
-                  ? 'text-[#1765B3] bg-[#D9EEFF] border border-[#B8DEFF]'
+                  ? 'text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF]'
                   : isManajemen
-                  ? 'text-purple-900 bg-purple-100 border border-purple-200'
+                  ? 'text-purple-900 bg-purple-50 border border-purple-200'
                   : isPic
-                  ? 'text-[#1765B3] bg-[#D9EEFF] border border-[#B8DEFF]'
+                  ? 'text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF]'
                   : 'text-slate-800 bg-slate-100 border border-slate-200'
               }`}
             >
@@ -209,18 +253,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : currentUser.role}
             </span>
           </div>
-          <p className="text-[10px] text-[#64748B] truncate mb-1">
+          <p className="text-[11px] text-slate-500 truncate mb-1.5 font-medium">
             {currentUser.department}
           </p>
-          <div className="flex items-center justify-between pt-1 border-t border-[#DCEAF7] text-[10px] text-[#64748B]">
+          <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] text-slate-400">
             <span className="font-mono-numbers">{currentUser.employeeId.split('-')[0]}</span>
             <span className="text-[#1765B3] font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2589E8]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2589E8] shadow-[0_0_4px_#2589E8]" />
               Terautentikasi
             </span>
           </div>
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden lg:flex w-64 border-r border-[#E2E8F0] flex-col shrink-0 min-h-[calc(100vh-65px)]">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Slide-Over Drawer with Backdrop Overlay */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={onCloseMobile}
+          />
+          {/* Drawer Panel */}
+          <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

@@ -132,7 +132,7 @@ export const PicManagementView: React.FC<PicManagementViewProps> = ({
           <select
             value={teamFilter}
             onChange={(e) => setTeamFilter(e.target.value)}
-            className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 font-medium"
+            className="text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#2589E8] font-medium"
           >
             <option value="ALL">Semua Tim Teknis</option>
             {teams.map((t) => (
@@ -176,7 +176,7 @@ export const PicManagementView: React.FC<PicManagementViewProps> = ({
                 <tr key={pic.uid} className="hover:bg-slate-50 transition-colors">
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-emerald-800 text-white font-bold text-xs flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-bold text-xs flex items-center justify-center shadow-2xs">
                         {pic.name.charAt(0)}
                       </div>
                       <div>
@@ -209,7 +209,7 @@ export const PicManagementView: React.FC<PicManagementViewProps> = ({
                   </td>
 
                   <td className="py-3.5 px-4 text-center font-mono-numbers">
-                    <span className="font-bold text-emerald-800 text-sm">{inProgress}</span>
+                    <span className="font-bold text-[#1765B3] text-sm">{inProgress}</span>
                     <span className="text-slate-400 text-[10px] block">sedang berjalan</span>
                   </td>
 
@@ -325,7 +325,7 @@ export const PicManagementView: React.FC<PicManagementViewProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-700 text-white font-bold rounded-lg hover:bg-emerald-800 cursor-pointer"
+                  className="px-4 py-2 bg-[#1765B3] text-white font-bold rounded-lg hover:bg-[#0A3D73] cursor-pointer shadow-xs transition-colors"
                 >
                   Simpan Perubahan
                 </button>

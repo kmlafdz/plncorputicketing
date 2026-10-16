@@ -43,7 +43,7 @@ export const SlaManagementView: React.FC = () => {
 
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-2 cursor-pointer transition-colors"
+          className="px-4 py-2 bg-[#1765B3] hover:bg-[#0A3D73] text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-2 cursor-pointer transition-colors"
         >
           <Save className="w-4 h-4" />
           <span>Simpan Perubahan SLA</span>
@@ -58,8 +58,8 @@ export const SlaManagementView: React.FC = () => {
       )}
 
       {/* Info Card */}
-      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-start gap-2.5">
-        <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+      <div className="p-4 bg-blue-50/60 border border-blue-200 rounded-xl text-xs text-slate-700 flex items-start gap-2.5">
+        <Info className="w-4 h-4 text-[#1765B3] shrink-0 mt-0.5" />
         <div className="leading-relaxed">
           <span className="font-bold text-slate-800">Kalender Kerja Operasional:</span> Waktu SLA dihitung
           berdasarkan jam kerja operasional PLN Corporate University (Senin - Jumat, 07:30 - 17:00 WIB). Laporan

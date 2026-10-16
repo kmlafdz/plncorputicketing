@@ -30,7 +30,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Profile Card */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b border-slate-100 pb-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-800 text-white font-extrabold text-2xl flex items-center justify-center shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-extrabold text-2xl flex items-center justify-center shadow-md">
             {currentUser.name
               .split(' ')
               .map((n) => n[0])
@@ -40,7 +40,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-extrabold text-slate-900">{currentUser.name}</h1>
-              <span className="bg-emerald-100 text-emerald-800 text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full">
+              <span className="bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] text-xs uppercase font-extrabold px-2.5 py-0.5 rounded-full">
                 {currentUser.role}
               </span>
             </div>
@@ -53,7 +53,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
             <span className="text-slate-400 font-medium flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-emerald-700" />
+              <Mail className="w-3.5 h-3.5 text-[#1765B3]" />
               Email Perusahaan
             </span>
             <p className="font-semibold text-slate-800">{currentUser.email}</p>
@@ -61,7 +61,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
             <span className="text-slate-400 font-medium flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-emerald-700" />
+              <Phone className="w-3.5 h-3.5 text-[#1765B3]" />
               Kontak / Telepon
             </span>
             <p className="font-semibold text-slate-800 font-mono-numbers">{currentUser.phone || '-'}</p>
@@ -69,7 +69,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
           <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
             <span className="text-slate-400 font-medium flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5 text-emerald-700" />
+              <Building className="w-3.5 h-3.5 text-[#1765B3]" />
               Instansi
             </span>
             <p className="font-semibold text-slate-800">PLN Corporate University</p>

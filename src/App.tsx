@@ -34,6 +34,7 @@ export default function App() {
   const [tickets, setTickets] = useState<Ticket[]>(() => storageService.getTickets());
   const [categories, setCategories] = useState<Category[]>(() => storageService.getCategories());
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Sync data whenever storageService or authService updates
   const refreshAppData = () => {
@@ -54,6 +55,7 @@ export default function App() {
   }, []);
 
   const handleNavigate = (view: string, ticketId?: string) => {
+    setIsMobileMenuOpen(false);
     if (ticketId) {
       setSelectedTicketId(ticketId);
       setCurrentView('ticket-detail');
@@ -81,6 +83,7 @@ export default function App() {
     setCurrentUser(null);
     setCurrentView('dashboard');
     setSelectedTicketId(null);
+    setIsMobileMenuOpen(false);
   };
 
   // If NOT authenticated, strictly present the Login Screen
@@ -102,17 +105,19 @@ export default function App() {
     .filter((n) => !n.isRead).length;
 
   return (
-    <div className="min-h-screen bg-[#F5FAFF] flex flex-col text-[#172B4D]">
-      {/* Top Header without simulation banners */}
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-[#0F172A]">
+      {/* Top Header */}
       <TopNavbar
         currentUser={currentUser}
         onNavigate={handleNavigate}
         onSearch={handleGlobalSearch}
         onLogout={handleLogout}
+        isMobileMenuOpen={isMobileMenuOpen}
+        onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
       />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar Navigation scoped strictly to role */}
+        {/* Left Sidebar Navigation */}
         <Sidebar
           currentView={currentView}
           onNavigate={handleNavigate}
@@ -124,10 +129,12 @@ export default function App() {
             notifications: notificationsCount,
           }}
           onLogout={handleLogout}
+          isMobileOpen={isMobileMenuOpen}
+          onCloseMobile={() => setIsMobileMenuOpen(false)}
         />
 
-        {/* Main Content Viewport with Route Protection */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        {/* Main Content Viewport */}
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-7">
           {currentView === 'dashboard' && (
             <DashboardView
               tickets={tickets}

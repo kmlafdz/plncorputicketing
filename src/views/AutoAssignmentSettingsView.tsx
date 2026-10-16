@@ -191,7 +191,7 @@ export const AutoAssignmentSettingsView: React.FC<AutoAssignmentSettingsViewProp
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Wrench className="w-4 h-4 text-emerald-700" />
+            <Wrench className="w-4 h-4 text-[#1765B3]" />
             <h2 className="text-sm font-bold text-slate-900">
               Kapasitas & Beban Kerja Petugas PIC (Real-Time)
             </h2>
@@ -210,7 +210,7 @@ export const AutoAssignmentSettingsView: React.FC<AutoAssignmentSettingsViewProp
               <div key={pic.uid} className="p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs">
+                    <div className="w-9 h-9 rounded-full bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] font-bold flex items-center justify-center text-xs shadow-2xs">
                       {pic.name.charAt(0)}
                     </div>
                     <div>
@@ -255,7 +255,7 @@ export const AutoAssignmentSettingsView: React.FC<AutoAssignmentSettingsViewProp
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-emerald-700" />
+            <Layers className="w-4 h-4 text-[#1765B3]" />
             <h2 className="text-sm font-bold text-slate-900">
               Matriks Aturan Auto-Assignment Kategori Tiket
             </h2>
@@ -448,7 +448,7 @@ export const AutoAssignmentSettingsView: React.FC<AutoAssignmentSettingsViewProp
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 bg-[#1765B3] hover:bg-[#0A3D73] text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   <span>Simpan Perubahan</span>

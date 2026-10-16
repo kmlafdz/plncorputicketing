@@ -4,20 +4,34 @@
   :root {
     --primary-blue: #2589E8;
     --deep-blue: #1765B3;
+    --navy-blue: #0A3D73;
+    --electric-yellow: #FFC72C;
     --light-blue: #D9EEFF;
     --pale-blue: #EFF8FF;
     --sky-blue: #B8DEFF;
-    --bg-main: #F5FAFF;
-    --border-enterprise: #DCEAF7;
-    --text-primary: #172B4D;
-    --text-secondary: #64748B;
-    --hover-bg: #EAF5FF;
+    --bg-main: #F8FAFC;
+    --border-enterprise: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --hover-bg: #F0F7FF;
+  }
+
+  * {
+    border-color: #E2E8F0;
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #F5FAFF;
-    color: #172B4D;
+    font-family: 'Plus Jakarta Sans', 'Lexend', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Lexend', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
   }
   
   .font-mono-numbers {
@@ -32,7 +46,7 @@
 }
 
 .bg-gradient-hero {
-  background: linear-gradient(120deg, #EAF5FF 0%, #D6EBFF 50%, #FFFFFF 100%);
+  background: linear-gradient(120deg, #F0F7FF 0%, #E0F0FE 50%, #FFFFFF 100%);
 }
 
 .bg-gradient-primary {
@@ -44,11 +58,32 @@
 }
 
 .bg-gradient-card {
-  background: linear-gradient(145deg, #FFFFFF 0%, #F0F8FF 100%);
+  background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
+}
+
+.bg-gradient-pln {
+  background: linear-gradient(135deg, #0A3D73 0%, #1765B3 60%, #2589E8 100%);
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
 }
 
 .border-enterprise {
-  border-color: #DCEAF7;
+  border-color: #E2E8F0;
+}
+
+/* Focus outline helper for accessibility */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid #2589E8;
+  outline-offset: 2px;
 }
 
 /* Custom subtle scrollbar */
@@ -61,8 +96,19 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Print utilities */
+@media print {
+  aside, header, button {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
 }
