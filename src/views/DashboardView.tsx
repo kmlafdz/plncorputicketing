@@ -104,6 +104,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Filter waktu pembuatan laporan ticketing (hari, minggu, bulan, tahun)
   const [intakeTimeFilter, setIntakeTimeFilter] = useState<'hari' | 'minggu' | 'bulan' | 'tahun'>('hari');
+  // Mode tampilan grafik data (batang vs tren garis)
+  const [chartMode, setChartMode] = useState<'bar' | 'area'>('bar');
+  const [hoveredBucketIndex, setHoveredBucketIndex] = useState<number | null>(null);
 
   // Kalkulasi statistik waktu masuknya laporan tiket
   const intakeAnalytics = useMemo(() => {
@@ -164,8 +167,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     const peakHourFormatted = `${String(peakHour).padStart(2, '0')}:00 - ${String((peakHour + 2) % 24).padStart(2, '0')}:00 WIB`;
 
     // Distribusi Frekuensi Berdasarkan Filter Terpilih
-    type DistributionBucket = { label: string; subLabel: string; count: number; percentage: number };
-    let buckets: DistributionBucket[] = [];
+    type DistributionBucket = {
+      label: string;
+      subLabel: string;
+      count: number;
+      percentage: number;
+      isPeak: boolean;
+    };
+    let rawBuckets: Omit<DistributionBucket, 'isPeak'>[] = [];
 
     if (intakeTimeFilter === 'hari') {
       const slots = [
@@ -177,7 +186,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         { label: '20:00 - 24:00', subLabel: 'Malam Hari', hours: [20, 21, 22, 23] },
       ];
       const maxCount = Math.max(...slots.map((s) => s.hours.reduce((acc, h) => acc + (hourHistogram[h] || 0), 0)), 1);
-      buckets = slots.map((s) => {
+      rawBuckets = slots.map((s) => {
         const count = s.hours.reduce((acc, h) => acc + (hourHistogram[h] || 0), 0);
         return {
           label: s.label,
@@ -195,7 +204,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       const order = [1, 2, 3, 4, 5, 6, 0];
       const dayFullNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const maxCount = Math.max(...Object.values(dayCounts), 1);
-      buckets = order.map((dIndex) => ({
+      rawBuckets = order.map((dIndex) => ({
         label: dayFullNames[dIndex],
         subLabel: dIndex >= 1 && dIndex <= 5 ? 'Hari Kerja' : 'Akhir Pekan',
         count: dayCounts[dIndex],
@@ -211,7 +220,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         else weekCounts[3]++;
       });
       const maxCount = Math.max(...weekCounts, 1);
-      buckets = [
+      rawBuckets = [
         { label: 'Minggu 1', subLabel: 'Tgl 1 - 7', count: weekCounts[0], percentage: Math.round((weekCounts[0] / maxCount) * 100) },
         { label: 'Minggu 2', subLabel: 'Tgl 8 - 14', count: weekCounts[1], percentage: Math.round((weekCounts[1] / maxCount) * 100) },
         { label: 'Minggu 3', subLabel: 'Tgl 15 - 21', count: weekCounts[2], percentage: Math.round((weekCounts[2] / maxCount) * 100) },
@@ -225,13 +234,41 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         monthCounts[m]++;
       });
       const maxCount = Math.max(...monthCounts, 1);
-      buckets = monthNames.map((name, idx) => ({
+      rawBuckets = monthNames.map((name, idx) => ({
         label: name,
         subLabel: `Bulan ${idx + 1}`,
         count: monthCounts[idx],
         percentage: Math.round((monthCounts[idx] / maxCount) * 100),
       }));
     }
+
+    // Identifikasi nilai puncak (peak)
+    const maxBucketCount = Math.max(...rawBuckets.map((b) => b.count), 0);
+    const buckets: DistributionBucket[] = rawBuckets.map((b) => ({
+      ...b,
+      isPeak: b.count === maxBucketCount && b.count > 0,
+    }));
+
+    // Skala nilai sumbu-Y grafik data
+    const chartMax =
+      maxBucketCount <= 4
+        ? 4
+        : maxBucketCount <= 8
+        ? 8
+        : maxBucketCount <= 12
+        ? 12
+        : maxBucketCount <= 20
+        ? 20
+        : Math.ceil(maxBucketCount / 5) * 5;
+
+    // 5 garis panduan horizontal genap (100%, 75%, 50%, 25%, 0%)
+    const yTicks = [
+      chartMax,
+      Math.round(chartMax * 0.75),
+      Math.round(chartMax * 0.5),
+      Math.round(chartMax * 0.25),
+      0,
+    ];
 
     const sortedTickets = [...filtered].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -243,9 +280,62 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       afterHoursCount,
       peakHourFormatted,
       buckets,
+      chartMax,
+      yTicks,
       tickets: sortedTickets,
     };
   }, [accessibleTickets, intakeTimeFilter]);
+
+  // Perhitungan koordinat SVG untuk grafik area & garis
+  const svgChart = useMemo(() => {
+    const buckets = intakeAnalytics.buckets;
+    const chartMax = intakeAnalytics.chartMax;
+    const paddingX = 40;
+    const paddingTop = 26;
+    const baselineY = 205;
+    const chartHeight = baselineY - paddingTop;
+    const totalWidth = 1000;
+
+    const points = buckets.map((b, i) => {
+      const x =
+        buckets.length > 1
+          ? paddingX + (i / (buckets.length - 1)) * (totalWidth - 2 * paddingX)
+          : totalWidth / 2;
+      const count = b.count;
+      const y = chartMax > 0 ? baselineY - (count / chartMax) * chartHeight : baselineY;
+      return { x, y, bucket: b, index: i };
+    });
+
+    if (points.length === 0) return { pathD: '', areaD: '', points: [] };
+    if (points.length === 1) {
+      return {
+        pathD: `M ${points[0].x} ${points[0].y}`,
+        areaD: `M ${points[0].x} ${points[0].y} L ${points[0].x} ${baselineY} Z`,
+        points,
+      };
+    }
+
+    let pathD = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i === 0 ? 0 : i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2] || p2;
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = Math.max(paddingTop, Math.min(baselineY, p1.y + (p2.y - p0.y) / 6));
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = Math.max(paddingTop, Math.min(baselineY, p2.y - (p3.y - p1.y) / 6));
+
+      pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+
+    const first = points[0];
+    const last = points[points.length - 1];
+    const areaD = `${pathD} L ${last.x.toFixed(1)} ${baselineY} L ${first.x.toFixed(1)} ${baselineY} Z`;
+
+    return { pathD, areaD, points };
+  }, [intakeAnalytics.buckets, intakeAnalytics.chartMax]);
 
   return (
     <div className="space-y-6">
@@ -514,47 +604,415 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
 
-            {/* Distribution Chart / Frequency Bars */}
-            <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-[#F8FAFC] space-y-3">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                <span className="text-xs font-bold text-slate-800 font-heading">
-                  Distribusi Frekuensi Waktu Masuk Laporan (
-                  {intakeTimeFilter === 'hari' ? 'Rentang Jam (WIB)' : intakeTimeFilter === 'minggu' ? 'Hari dalam Seminggu' : intakeTimeFilter === 'bulan' ? 'Mingguan dalam Sebulan' : 'Bulanan dalam Setahun'}
-                  )
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium">
-                  {intakeAnalytics.totalCount} total laporan terekam
-                </span>
+            {/* Visual Data Chart: Tren & Distribusi Waktu Masuk Laporan */}
+            <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-[#F8FAFC] space-y-4 shadow-2xs">
+              {/* Chart Header with Mode Toggle & Dynamic Subtitle */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3.5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#1765B3]" />
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-heading">
+                      Grafik Tren & Distribusi Waktu Masuk Tiket
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {intakeTimeFilter === 'hari'
+                      ? 'Frekuensi kedatangan tiket per rentang jam (24 jam hari ini)'
+                      : intakeTimeFilter === 'minggu'
+                      ? 'Frekuensi kedatangan tiket per hari (7 hari terakhir)'
+                      : intakeTimeFilter === 'bulan'
+                      ? 'Frekuensi kedatangan tiket per minggu (30 hari terakhir)'
+                      : 'Frekuensi kedatangan tiket per bulan (12 bulan tahun berjalan)'}
+                  </p>
+                </div>
+
+                {/* View Mode Toggle: Bar vs Area/Line */}
+                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200 text-xs font-semibold self-stretch sm:self-auto shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setChartMode('bar')}
+                    className={`px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      chartMode === 'bar'
+                        ? 'bg-[#0A3D73] text-white shadow-2xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    <span>Grafik Batang</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChartMode('area')}
+                    className={`px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      chartMode === 'area'
+                        ? 'bg-[#0A3D73] text-white shadow-2xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
+                  >
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    <span>Tren Garis</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Histogram Bars */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 pt-2">
-                {intakeAnalytics.buckets.map((b, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between space-y-2 hover:border-[#B8DEFF] transition-all"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-700 truncate">{b.label}</span>
-                      <span className="text-xs font-extrabold text-[#1765B3] font-mono-numbers">
-                        {b.count}
+              {/* Dynamic Interactive Banner & Legend */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5 px-3 py-2 rounded-xl bg-white border border-slate-200/90 text-xs">
+                {hoveredBucketIndex !== null && intakeAnalytics.buckets[hoveredBucketIndex] ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#1765B3]" />
+                    <span className="font-bold text-[#0F172A]">
+                      {intakeAnalytics.buckets[hoveredBucketIndex].label}
+                    </span>
+                    <span className="text-slate-500 text-[11px]">
+                      ({intakeAnalytics.buckets[hoveredBucketIndex].subLabel})
+                    </span>
+                    <span className="font-extrabold text-[#1765B3] font-mono-numbers bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-md text-[11px]">
+                      {intakeAnalytics.buckets[hoveredBucketIndex].count} tiket ({intakeAnalytics.buckets[hoveredBucketIndex].percentage}%)
+                    </span>
+                    {intakeAnalytics.buckets[hoveredBucketIndex].isPeak && (
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
+                        Waktu Puncak
                       </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-slate-500 text-xs">
+                    <Clock className="w-3.5 h-3.5 text-[#1765B3] shrink-0" />
+                    <span>
+                      Waktu Puncak Masuk: <strong className="text-[#0A3D73] font-mono-numbers">{intakeAnalytics.peakHourFormatted}</strong> • Total <strong className="text-[#0F172A] font-mono-numbers">{intakeAnalytics.totalCount} tiket</strong>
+                    </span>
+                  </div>
+                )}
+
+                {/* Legend Indicators */}
+                <div className="flex items-center gap-3 text-[11px] text-slate-500 ml-auto">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-[#0A3D73] to-[#2589E8]" />
+                    <span>Volume Laporan</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-amber-400 border border-amber-500" />
+                    <span>Waktu Puncak</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Chart Canvas Container */}
+              <div className="w-full bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-2xs overflow-x-auto scrollbar-thin">
+                <div className={`w-full ${intakeAnalytics.buckets.length > 7 ? 'min-w-[560px]' : 'min-w-[320px]'}`}>
+                  {/* Plot Area with Left Y-Axis and Chart Canvas */}
+                  <div className="relative h-60 sm:h-64 flex">
+                    {/* Y-Axis Numerical Scale Labels */}
+                    <div className="w-8 sm:w-10 h-full flex flex-col justify-between items-end pr-2.5 text-[10px] sm:text-[11px] font-semibold text-slate-400 font-mono-numbers select-none shrink-0 pb-1">
+                      {intakeAnalytics.yTicks.map((val, idx) => (
+                        <span key={idx} className="leading-none">
+                          {val}
+                        </span>
+                      ))}
                     </div>
 
-                    {/* Progress Bar Track */}
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-[#0A3D73] to-[#2589E8] h-full rounded-full transition-all duration-500"
-                        style={{ width: `${Math.max(b.percentage, b.count > 0 ? 12 : 0)}%` }}
-                      />
-                    </div>
+                    {/* Chart Plot Area with Gridlines */}
+                    <div className="flex-1 h-full relative">
+                      {/* Horizontal Gridlines */}
+                      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-1">
+                        {intakeAnalytics.yTicks.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className={`w-full ${
+                              idx === intakeAnalytics.yTicks.length - 1
+                                ? 'border-b-2 border-slate-300'
+                                : 'border-b border-dashed border-slate-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-slate-400">
-                      <span className="truncate">{b.subLabel}</span>
-                      <span className="font-mono-numbers">{b.count > 0 ? `${b.percentage}%` : '0%'}</span>
+                      {/* MODE 1: VERTICAL BAR CHART */}
+                      {chartMode === 'bar' && (
+                        <div className="absolute inset-0 flex items-end justify-between gap-1.5 sm:gap-3 px-2 sm:px-4 pb-1">
+                          {intakeAnalytics.buckets.map((b, idx) => {
+                            const isHovered = hoveredBucketIndex === idx;
+                            const barHeightPercent = Math.max(
+                              (b.count / intakeAnalytics.chartMax) * 100,
+                              b.count > 0 ? 8 : 2
+                            );
+
+                            return (
+                              <div
+                                key={idx}
+                                onMouseEnter={() => setHoveredBucketIndex(idx)}
+                                onMouseLeave={() => setHoveredBucketIndex(null)}
+                                onClick={() => setHoveredBucketIndex(idx)}
+                                className="flex-1 h-full flex flex-col justify-end items-center relative group cursor-pointer"
+                              >
+                                {/* Floating Tooltip Card */}
+                                {isHovered && (
+                                  <div className="absolute -top-12 z-30 pointer-events-none transform -translate-x-1/2 left-1/2 whitespace-nowrap bg-[#0F172A] text-white text-[11px] py-1.5 px-3 rounded-xl shadow-xl border border-slate-700 animate-in fade-in zoom-in-95 duration-150">
+                                    <div className="font-bold text-sky-300">{b.label}</div>
+                                    <div className="flex items-center gap-1.5 text-slate-300 font-mono-numbers">
+                                      <span>{b.count} tiket</span>
+                                      <span>•</span>
+                                      <span>{b.percentage}%</span>
+                                      {b.isPeak && <span className="text-amber-400 font-bold">★ Puncak</span>}
+                                    </div>
+                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0F172A] rotate-45 border-r border-b border-slate-700" />
+                                  </div>
+                                )}
+
+                                {/* Top Value Pill on Bar */}
+                                <div className="mb-1 text-center transition-transform duration-200 group-hover:-translate-y-0.5">
+                                  {b.count > 0 ? (
+                                    <span
+                                      className={`text-[10px] sm:text-xs font-black font-mono-numbers px-1.5 py-0.5 rounded-md shadow-2xs ${
+                                        b.isPeak
+                                          ? 'bg-amber-100 text-amber-900 border border-amber-300 ring-1 ring-amber-300'
+                                          : isHovered
+                                          ? 'bg-[#0A3D73] text-white'
+                                          : 'bg-[#EFF8FF] text-[#0A3D73] border border-[#B8DEFF]'
+                                      }`}
+                                    >
+                                      {b.count}
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-slate-300 font-mono-numbers">0</span>
+                                  )}
+                                </div>
+
+                                {/* The Bar Element */}
+                                <div
+                                  className={`w-full max-w-[48px] sm:max-w-[64px] min-w-[14px] sm:min-w-[20px] rounded-t-lg sm:rounded-t-xl transition-all duration-300 ease-out ${
+                                    b.isPeak
+                                      ? 'bg-gradient-to-t from-[#0A3D73] via-[#1765B3] to-amber-400 border-t-2 border-amber-300 shadow-xs'
+                                      : b.count > 0
+                                      ? 'bg-gradient-to-t from-[#0A3D73] to-[#2589E8] shadow-2xs'
+                                      : 'bg-slate-200/70'
+                                  } ${isHovered ? 'ring-2 ring-[#2589E8]/50 brightness-110 shadow-md scale-y-[1.02] origin-bottom' : ''}`}
+                                  style={{ height: `${barHeightPercent}%` }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* MODE 2: SMOOTH AREA & LINE TREND CHART */}
+                      {chartMode === 'area' && (
+                        <div className="absolute inset-0 pb-1">
+                          <svg
+                            viewBox="0 0 1000 240"
+                            preserveAspectRatio="none"
+                            className="w-full h-full overflow-visible"
+                          >
+                            <defs>
+                              <linearGradient id="intakeAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#2589E8" stopOpacity="0.38" />
+                                <stop offset="85%" stopColor="#1765B3" stopOpacity="0.08" />
+                                <stop offset="100%" stopColor="#1765B3" stopOpacity="0.0" />
+                              </linearGradient>
+                              <linearGradient id="intakeLineGrad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stopColor="#0A3D73" />
+                                <stop offset="50%" stopColor="#1765B3" />
+                                <stop offset="100%" stopColor="#2589E8" />
+                              </linearGradient>
+                            </defs>
+
+                            {/* Area Gradient Fill */}
+                            {svgChart.areaD && (
+                              <path d={svgChart.areaD} fill="url(#intakeAreaGrad)" />
+                            )}
+
+                            {/* Spline Stroke Line */}
+                            {svgChart.pathD && (
+                              <path
+                                d={svgChart.pathD}
+                                fill="none"
+                                stroke="url(#intakeLineGrad)"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            )}
+
+                            {/* Coordinate Point Dots & Labels */}
+                            {svgChart.points.map((pt, idx) => {
+                              const isHovered = hoveredBucketIndex === idx;
+                              return (
+                                <g
+                                  key={idx}
+                                  className="cursor-pointer"
+                                  onMouseEnter={() => setHoveredBucketIndex(idx)}
+                                  onMouseLeave={() => setHoveredBucketIndex(null)}
+                                  onClick={() => setHoveredBucketIndex(idx)}
+                                >
+                                  {/* Vertical Guide Line on Hover */}
+                                  {isHovered && (
+                                    <line
+                                      x1={pt.x}
+                                      y1={26}
+                                      x2={pt.x}
+                                      y2={205}
+                                      stroke="#1765B3"
+                                      strokeWidth="1.5"
+                                      strokeDasharray="4 3"
+                                      opacity="0.7"
+                                    />
+                                  )}
+
+                                  {/* Value text above node */}
+                                  {pt.bucket.count > 0 && (
+                                    <text
+                                      x={pt.x}
+                                      y={pt.y - 10}
+                                      textAnchor="middle"
+                                      fill={pt.bucket.isPeak ? '#B45309' : '#0A3D73'}
+                                      fontSize="13"
+                                      fontWeight="bold"
+                                      fontFamily="monospace"
+                                    >
+                                      {pt.bucket.count}
+                                    </text>
+                                  )}
+
+                                  {/* Outer pulse circle when hovered */}
+                                  {isHovered && (
+                                    <circle
+                                      cx={pt.x}
+                                      cy={pt.y}
+                                      r="11"
+                                      fill="#2589E8"
+                                      fillOpacity="0.2"
+                                    />
+                                  )}
+
+                                  {/* Node Circle */}
+                                  <circle
+                                    cx={pt.x}
+                                    cy={pt.y}
+                                    r={isHovered ? 7 : pt.bucket.isPeak ? 6 : 4.5}
+                                    fill={pt.bucket.isPeak ? '#F59E0B' : '#ffffff'}
+                                    stroke={pt.bucket.isPeak ? '#B45309' : '#0A3D73'}
+                                    strokeWidth={isHovered ? 3 : 2}
+                                    className="transition-all duration-200"
+                                  />
+
+                                  {/* Invisible expanded hit target */}
+                                  <circle
+                                    cx={pt.x}
+                                    cy={pt.y}
+                                    r="20"
+                                    fill="transparent"
+                                  />
+                                </g>
+                              );
+                            })}
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+
+                  {/* X-Axis Categorical Labels (Directly Aligned with Plot Coordinates) */}
+                  <div className="flex pl-8 sm:pl-10 pt-2.5">
+                    <div className="w-full flex justify-between gap-1.5 sm:gap-3 px-2 sm:px-4">
+                      {intakeAnalytics.buckets.map((b, idx) => {
+                        const isHovered = hoveredBucketIndex === idx;
+                        return (
+                          <div
+                            key={idx}
+                            onMouseEnter={() => setHoveredBucketIndex(idx)}
+                            onMouseLeave={() => setHoveredBucketIndex(null)}
+                            onClick={() => setHoveredBucketIndex(idx)}
+                            className="flex-1 text-center min-w-0 cursor-pointer"
+                          >
+                            <span
+                              className={`block text-[10px] sm:text-xs font-bold truncate transition-colors ${
+                                isHovered
+                                  ? 'text-[#0A3D73]'
+                                  : b.isPeak
+                                  ? 'text-amber-900'
+                                  : 'text-slate-800'
+                              }`}
+                              title={b.label}
+                            >
+                              {b.label}
+                            </span>
+                            <span
+                              className={`block text-[9px] sm:text-[10px] truncate ${
+                                isHovered
+                                  ? 'text-[#1765B3] font-semibold'
+                                  : b.isPeak
+                                  ? 'text-amber-700 font-semibold'
+                                  : 'text-slate-400'
+                              }`}
+                              title={b.subLabel}
+                            >
+                              {b.subLabel}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Synchronized Breakdown Grid Cards Below the Chart */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 pt-1">
+                {intakeAnalytics.buckets.map((b, idx) => {
+                  const isHovered = hoveredBucketIndex === idx;
+                  return (
+                    <div
+                      key={idx}
+                      onMouseEnter={() => setHoveredBucketIndex(idx)}
+                      onMouseLeave={() => setHoveredBucketIndex(null)}
+                      onClick={() => setHoveredBucketIndex(idx)}
+                      className={`p-3 bg-white rounded-xl border transition-all cursor-pointer shadow-2xs flex flex-col justify-between space-y-2 ${
+                        isHovered
+                          ? 'border-[#1765B3] ring-2 ring-[#2589E8]/20 -translate-y-0.5 shadow-sm'
+                          : b.isPeak
+                          ? 'border-amber-300 bg-amber-50/20'
+                          : 'border-slate-200 hover:border-[#B8DEFF]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[11px] font-bold text-slate-700 truncate" title={b.label}>
+                          {b.label}
+                        </span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {b.isPeak && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-amber-200" />
+                          )}
+                          <span
+                            className={`text-xs font-extrabold font-mono-numbers ${
+                              b.isPeak ? 'text-amber-700' : 'text-[#1765B3]'
+                            }`}
+                          >
+                            {b.count}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar Track */}
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            b.isPeak
+                              ? 'bg-gradient-to-r from-amber-500 to-amber-400'
+                              : 'bg-gradient-to-r from-[#0A3D73] to-[#2589E8]'
+                          }`}
+                          style={{ width: `${Math.max(b.percentage, b.count > 0 ? 12 : 0)}%` }}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-400">
+                        <span className="truncate">{b.subLabel}</span>
+                        <span className="font-mono-numbers font-medium">
+                          {b.count > 0 ? `${b.percentage}%` : '0%'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
