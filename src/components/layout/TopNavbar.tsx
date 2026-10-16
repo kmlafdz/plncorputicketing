@@ -136,10 +136,12 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] transition-colors cursor-pointer focus-ring"
+              className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-[#F0F7FF] active:scale-90 transition-all cursor-pointer focus-ring"
               aria-label={isMobileMenuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5 text-slate-700" /> : <Menu className="w-5 h-5" />}
+              <div className={`transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
+                {isMobileMenuOpen ? <X className="w-5 h-5 text-slate-700" /> : <Menu className="w-5 h-5" />}
+              </div>
             </button>
           )}
 

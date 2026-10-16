@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   LayoutDashboard,
   Ticket,
@@ -48,6 +48,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isPic = currentUser.role === 'pic';
   const isPelapor = currentUser.role === 'pelapor';
   const isManajemen = currentUser.role === 'manajemen';
+
+  // Swipe-to-dismiss gesture states
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const touchStartXRef = useRef<number>(0);
+  const touchStartTimeRef = useRef<number>(0);
+
+  // Lock body scroll when mobile drawer is open to prevent background jitter
+  useEffect(() => {
+    if (isMobileOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isMobileOpen]);
+
+  // Handle ESC key to fluently dismiss drawer
+  useEffect(() => {
+    if (!isMobileOpen || !onCloseMobile) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCloseMobile();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileOpen, onCloseMobile]);
+
+  // Touch handlers for fluid swipe-to-close gesture
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartTimeRef.current = Date.now();
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - touchStartXRef.current;
+    // Only track drag to the left (negative direction)
+    if (diff < 0) {
+      setDragOffset(diff);
+    } else {
+      setDragOffset(0);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const dragDuration = Date.now() - touchStartTimeRef.current;
+    const isQuickSwipe = dragOffset < -30 && dragDuration < 250;
+    const isDeepDrag = dragOffset < -70;
+
+    if ((isQuickSwipe || isDeepDrag) && onCloseMobile) {
+      onCloseMobile();
+    }
+    setDragOffset(0);
+  };
 
   const handleItemClick = (id: string) => {
     onNavigate(id);
@@ -119,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
         <button
           onClick={onCloseMobile}
-          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 cursor-pointer"
+          className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-200/80 active:scale-90 transition-all cursor-pointer"
           aria-label="Tutup Menu"
         >
           <X className="w-5 h-5" />
@@ -259,7 +320,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] text-slate-400">
             <span className="font-mono-numbers">{currentUser.employeeId.split('-')[0]}</span>
             <span className="text-[#1765B3] font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2589E8] shadow-[0_0_4px_#2589E8]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2589E8]" />
               Terautentikasi
             </span>
           </div>
@@ -275,20 +336,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {sidebarContent}
       </aside>
 
-      {/* Mobile Slide-Over Drawer with Backdrop Overlay */}
-      {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
-            onClick={onCloseMobile}
-          />
-          {/* Drawer Panel */}
-          <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
-            {sidebarContent}
-          </div>
+      {/* Mobile Slide-Over Drawer with Fluent Backdrop Overlay & Touch Gesture Support */}
+      <div
+        className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
+          isMobileOpen
+            ? 'pointer-events-auto visible opacity-100'
+            : 'pointer-events-none invisible opacity-0 delay-200'
+        }`}
+        aria-hidden={!isMobileOpen}
+      >
+        {/* Backdrop with Frosted Glass Fade */}
+        <div
+          className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+            isMobileOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={onCloseMobile}
+        />
+
+        {/* Drawer Panel with Fluent Spring/Bezier Easing */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            transform: isMobileOpen
+              ? `translateX(${dragOffset}px)`
+              : 'translateX(-100%)',
+            transition: isDragging
+              ? 'none'
+              : 'transform 320ms cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200/80 select-none"
+        >
+          {/* Subtle Pull Indicator / Close Handle on mobile */}
+          <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-10 bg-slate-300/80 rounded-full sm:hidden pointer-events-none" />
+          {sidebarContent}
         </div>
-      )}
+      </div>
     </>
   );
 };
