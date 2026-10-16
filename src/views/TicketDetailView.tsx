@@ -48,6 +48,7 @@ interface TicketDetailViewProps {
   currentUser: UserType;
   onNavigate: (view: string, ticketId?: string) => void;
   onBack: () => void;
+  isModal?: boolean;
 }
 
 export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
@@ -55,6 +56,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
   currentUser,
   onNavigate,
   onBack,
+  isModal = false,
 }) => {
   const [ticket, setTicket] = useState<Ticket | undefined>(() =>
     storageService.getTicketById(ticketId)
@@ -460,7 +462,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
             className="flex items-center gap-1.5 font-semibold text-[#1765B3] hover:text-[#0A3D73] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Kembali ke Daftar Tiket</span>
+            <span>{isModal ? 'Tutup Pop-up Detail' : 'Kembali ke Daftar Tiket'}</span>
           </button>
           <div className="flex items-center gap-2">
             <span>Tiket</span>
@@ -1152,7 +1154,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 
       {/* --- MODAL 1: Assign PIC Modal --- */}
       {showAssignModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-slate-900">
               Penetapan Petugas PIC
@@ -1216,7 +1218,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 
       {/* --- MODAL 2: Change Priority Modal --- */}
       {showPriorityModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-slate-900">
               Penyesuaian Prioritas Tiket
@@ -1278,7 +1280,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 
       {/* --- MODAL 3: Resolve Ticket Modal --- */}
       {showResolveModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-slate-900">
               Penyelesaian Tiket & Dokumentasi Solusi
@@ -1324,7 +1326,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 
       {/* --- MODAL 4: Reject Ticket Modal --- */}
       {showRejectModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-rose-700">
               Tolak Laporan Tiket
@@ -1370,7 +1372,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
 
       {/* --- MODAL 5: Reopen Ticket Modal --- */}
       {showReopenModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-slate-900">
               Ajukan Pembukaan Kembali Tiket (Reopen)
