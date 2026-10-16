@@ -404,15 +404,15 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
             </div>
           ) : (
             <>
-              {/* Mobile Card List View (< md:) */}
-              <div className="md:hidden divide-y divide-slate-100 bg-white">
+              {/* Mobile Card List View (< md:) with distinct spacing per ticket */}
+              <div className="md:hidden p-3 sm:p-4 space-y-3 bg-[#F8FAFC]">
                 {paginatedTickets.map((ticket) => {
                   const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
                   return (
                     <div
                       key={ticket.id}
                       onClick={() => onNavigate('ticket-detail', ticket.id)}
-                      className="p-3.5 space-y-2 active:bg-slate-50 transition-colors cursor-pointer"
+                      className="bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-[#1765B3]/40 p-3.5 space-y-2.5 transition-all active:scale-[0.99] cursor-pointer"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono-numbers font-bold text-xs text-[#1765B3]">
@@ -440,7 +440,7 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-mono-numbers">
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[10px] font-mono-numbers">
                         <span
                           className={`flex items-center gap-1 font-semibold ${
                             sla.isOverdue
@@ -465,131 +465,133 @@ export const TicketListView: React.FC<TicketListViewProps> = ({
                 })}
               </div>
 
-              {/* Desktop / Tablet Table View (>= md:) */}
-              <table className="hidden md:table w-full text-left border-collapse min-w-[700px]">
-              <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                  <th className="py-3 px-4">Nomor Tiket</th>
-                  <th className="py-3 px-4">Subjek Kendala</th>
-                  <th className="py-3 px-4">Prioritas</th>
-                  <th className="py-3 px-4">Petugas PIC</th>
-                  <th className="py-3 px-4">Pelapor & Dept</th>
-                  <th className="py-3 px-4">Tanggal Dibuat</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Target SLA</th>
-                  <th className="py-3 px-4 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-                {paginatedTickets.map((ticket) => {
-                  const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
-                  return (
-                    <tr
-                      key={ticket.id}
-                      onClick={() => onNavigate('ticket-detail', ticket.id)}
-                      className="hover:bg-[#F8FAFC] transition-colors cursor-pointer group"
-                    >
-                      {/* Ticket Number */}
-                      <td className="py-3.5 px-4 font-mono-numbers font-bold text-[#1765B3] whitespace-nowrap">
-                        #{ticket.ticketNumber}
-                      </td>
-
-                      {/* Subject & Type */}
-                      <td className="py-3.5 px-4 max-w-xs">
-                        <div className="font-semibold text-[#0F172A] group-hover:text-[#2589E8] transition-colors truncate">
-                          {ticket.title}
-                        </div>
-                        <div className="text-[11px] text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
-                          {ticket.categoryCode && (
-                            <span className="font-mono text-[10px] font-bold text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF] px-1.5 py-0.2 rounded shrink-0">
-                              {ticket.categoryCode}
-                            </span>
-                          )}
-                          <span className="truncate">{ticket.categoryName}</span>
-                          <span>·</span>
-                          <span className="text-slate-500 font-medium shrink-0">{ticket.type}</span>
-                        </div>
-                      </td>
-
-                      {/* Priority Badge */}
-                      <td className="py-3.5 px-4">
-                        <PriorityBadge priority={ticket.priority} size="sm" />
-                      </td>
-
-                      {/* Assignee / PIC */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        {ticket.currentPicName ? (
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded-full bg-[#EFF8FF] text-[#1765B3] text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#B8DEFF]">
-                              {ticket.currentPicName.charAt(0)}
-                            </div>
-                            <span className="font-semibold text-slate-800 truncate max-w-[150px]">
-                              {formatPicDisplayName(ticket.currentPicId, ticket.currentPicName)}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 italic text-[11px]">- Belum Ada -</span>
-                        )}
-                      </td>
-
-                      {/* Reporter & Department */}
-                      <td className="py-3.5 px-4">
-                        <div className="font-semibold text-[#0F172A] truncate max-w-[130px]">
-                          {ticket.reporterName}
-                        </div>
-                        <div className="text-[11px] text-slate-500 truncate max-w-[140px]">
-                          {ticket.department}
-                        </div>
-                      </td>
-
-                      {/* Created Date */}
-                      <td className="py-3.5 px-4 font-mono-numbers text-slate-500 whitespace-nowrap text-[11px]">
-                        {new Date(ticket.createdAt).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </td>
-
-                      {/* Status Badge */}
-                      <td className="py-3.5 px-4">
-                        <StatusBadge status={ticket.status} size="sm" />
-                      </td>
-
-                      {/* SLA Target */}
-                      <td className="py-3.5 px-4 font-mono-numbers whitespace-nowrap">
-                        <span
-                          className={`text-[11px] font-semibold flex items-center gap-1 ${
-                            sla.isOverdue
-                              ? 'text-rose-600'
-                              : sla.isNearingBreach
-                              ? 'text-amber-600'
-                              : 'text-slate-600'
-                          }`}
-                        >
-                          <Clock className="w-3 h-3 shrink-0" />
-                          {sla.remainingFormatted}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onNavigate('ticket-detail', ticket.id);
-                          }}
-                          className="px-3 py-1.5 text-xs font-semibold text-[#0A3D73] bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#EFF8FF] hover:border-[#B8DEFF] shadow-2xs transition-colors cursor-pointer"
-                        >
-                          Kelola
-                        </button>
-                      </td>
+              {/* Desktop / Tablet Table View (>= md:) with clean row spacing per ticket */}
+              <div className="hidden md:block overflow-x-auto p-3 sm:p-4 bg-[#F8FAFC]">
+                <table className="w-full text-left border-separate border-spacing-y-2.5 min-w-[700px]">
+                  <thead>
+                    <tr className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="pb-2.5 px-4">Nomor Tiket</th>
+                      <th className="pb-2.5 px-4">Subjek Kendala</th>
+                      <th className="pb-2.5 px-4">Prioritas</th>
+                      <th className="pb-2.5 px-4">Petugas PIC</th>
+                      <th className="pb-2.5 px-4">Pelapor & Dept</th>
+                      <th className="pb-2.5 px-4">Tanggal Dibuat</th>
+                      <th className="pb-2.5 px-4">Status</th>
+                      <th className="pb-2.5 px-4">Target SLA</th>
+                      <th className="pb-2.5 px-4 text-right">Aksi</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="text-xs text-slate-700">
+                    {paginatedTickets.map((ticket) => {
+                      const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
+                      return (
+                        <tr
+                          key={ticket.id}
+                          onClick={() => onNavigate('ticket-detail', ticket.id)}
+                          className="hover:bg-[#F0F7FF]/60 transition-all cursor-pointer group shadow-2xs"
+                        >
+                          {/* Ticket Number */}
+                          <td className="py-3.5 px-4 font-mono-numbers font-bold text-[#1765B3] whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 rounded-l-xl border-y border-l border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            #{ticket.ticketNumber}
+                          </td>
+
+                          {/* Subject & Type */}
+                          <td className="py-3.5 px-4 max-w-xs bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <div className="font-semibold text-[#0F172A] group-hover:text-[#2589E8] transition-colors truncate">
+                              {ticket.title}
+                            </div>
+                            <div className="text-[11px] text-slate-500 truncate flex items-center gap-1.5 mt-0.5">
+                              {ticket.categoryCode && (
+                                <span className="font-mono text-[10px] font-bold text-[#0A3D73] bg-[#EFF8FF] border border-[#B8DEFF] px-1.5 py-0.2 rounded shrink-0">
+                                  {ticket.categoryCode}
+                                </span>
+                              )}
+                              <span className="truncate">{ticket.categoryName}</span>
+                              <span>·</span>
+                              <span className="text-slate-500 font-medium shrink-0">{ticket.type}</span>
+                            </div>
+                          </td>
+
+                          {/* Priority Badge */}
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <PriorityBadge priority={ticket.priority} size="sm" />
+                          </td>
+
+                          {/* Assignee / PIC */}
+                          <td className="py-3.5 px-4 whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            {ticket.currentPicName ? (
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-6 h-6 rounded-full bg-[#EFF8FF] text-[#1765B3] text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#B8DEFF]">
+                                  {ticket.currentPicName.charAt(0)}
+                                </div>
+                                <span className="font-semibold text-slate-800 truncate max-w-[150px]">
+                                  {formatPicDisplayName(ticket.currentPicId, ticket.currentPicName)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 italic text-[11px]">- Belum Ada -</span>
+                            )}
+                          </td>
+
+                          {/* Reporter & Department */}
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <div className="font-semibold text-[#0F172A] truncate max-w-[130px]">
+                              {ticket.reporterName}
+                            </div>
+                            <div className="text-[11px] text-slate-500 truncate max-w-[140px]">
+                              {ticket.department}
+                            </div>
+                          </td>
+
+                          {/* Created Date */}
+                          <td className="py-3.5 px-4 font-mono-numbers text-slate-500 whitespace-nowrap text-[11px] bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            {new Date(ticket.createdAt).toLocaleDateString('id-ID', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </td>
+
+                          {/* Status Badge */}
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <StatusBadge status={ticket.status} size="sm" />
+                          </td>
+
+                          {/* SLA Target */}
+                          <td className="py-3.5 px-4 font-mono-numbers whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <span
+                              className={`text-[11px] font-semibold flex items-center gap-1 ${
+                                sla.isOverdue
+                                  ? 'text-rose-600'
+                                  : sla.isNearingBreach
+                                  ? 'text-amber-600'
+                                  : 'text-slate-600'
+                              }`}
+                            >
+                              <Clock className="w-3 h-3 shrink-0" />
+                              {sla.remainingFormatted}
+                            </span>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 rounded-r-xl border-y border-r border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNavigate('ticket-detail', ticket.id);
+                              }}
+                              className="px-3 py-1.5 text-xs font-semibold text-[#0A3D73] bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#EFF8FF] hover:border-[#B8DEFF] shadow-2xs transition-colors cursor-pointer"
+                            >
+                              Kelola
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </>
           )}
         </div>

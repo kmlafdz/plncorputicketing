@@ -1032,19 +1032,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   Tidak ada laporan tiket yang masuk pada periode waktu yang dipilih ({intakeTimeFilter}).
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-2xs">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-[#F8FAFC] border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
-                      <tr>
-                        <th className="py-3 px-3.5">Waktu Masuk Laporan</th>
-                        <th className="py-3 px-3.5">Nomor & Judul Tiket</th>
-                        <th className="py-3 px-3.5">Kategori & Pelapor</th>
-                        <th className="py-3 px-3.5">Prioritas</th>
-                        <th className="py-3 px-3.5">Status</th>
-                        <th className="py-3 px-3.5 text-right">Aksi</th>
+                <div className="overflow-x-auto p-2 sm:p-3 bg-[#F8FAFC] rounded-xl border border-slate-200 shadow-2xs">
+                  <table className="w-full text-left text-xs border-separate border-spacing-y-2">
+                    <thead>
+                      <tr className="text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                        <th className="pb-2 px-3.5">Waktu Masuk Laporan</th>
+                        <th className="pb-2 px-3.5">Nomor & Judul Tiket</th>
+                        <th className="pb-2 px-3.5">Kategori & Pelapor</th>
+                        <th className="pb-2 px-3.5">Prioritas</th>
+                        <th className="pb-2 px-3.5">Status</th>
+                        <th className="pb-2 px-3.5 text-right">Aksi</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 bg-white">
+                    <tbody>
                       {intakeAnalytics.tickets.slice(0, 8).map((t) => {
                         const dateObj = new Date(t.createdAt);
                         const isDateValid = !isNaN(dateObj.getTime());
@@ -1060,8 +1060,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           : '-';
 
                         return (
-                          <tr key={t.id} className="hover:bg-[#F8FAFC] transition-colors">
-                            <td className="py-3 px-3.5 whitespace-nowrap">
+                          <tr key={t.id} className="hover:bg-[#F0F7FF]/60 transition-all shadow-2xs group cursor-pointer" onClick={() => onNavigate('ticket-detail', t.id)}>
+                            <td className="py-3 px-3.5 whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 rounded-l-xl border-y border-l border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <div className="space-y-0.5">
                                 <span className="font-mono-numbers font-bold text-slate-900 block text-xs">
                                   {timeFormatted}
@@ -1081,7 +1081,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               </div>
                             </td>
 
-                            <td className="py-3 px-3.5 max-w-[240px]">
+                            <td className="py-3 px-3.5 max-w-[240px] bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <span className="font-mono text-[10px] font-bold text-[#1765B3] block">
                                 #{t.ticketNumber}
                               </span>
@@ -1090,7 +1090,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               </span>
                             </td>
 
-                            <td className="py-3 px-3.5">
+                            <td className="py-3 px-3.5 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <span className="text-slate-800 font-medium block text-xs">
                                 {t.categoryName}
                               </span>
@@ -1099,17 +1099,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               </span>
                             </td>
 
-                            <td className="py-3 px-3.5 whitespace-nowrap">
+                            <td className="py-3 px-3.5 whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <PriorityBadge priority={t.priority} size="sm" />
                             </td>
 
-                            <td className="py-3 px-3.5 whitespace-nowrap">
+                            <td className="py-3 px-3.5 whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <StatusBadge status={t.status} size="sm" />
                             </td>
 
-                            <td className="py-3 px-3.5 text-right whitespace-nowrap">
+                            <td className="py-3 px-3.5 text-right whitespace-nowrap bg-white group-hover:bg-[#F0F7FF]/60 rounded-r-xl border-y border-r border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
                               <button
-                                onClick={() => onNavigate('ticket-detail', t.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onNavigate('ticket-detail', t.id);
+                                }}
                                 className="px-2.5 py-1 text-[11px] font-bold bg-[#EFF8FF] text-[#1765B3] hover:bg-[#1765B3] hover:text-white rounded-lg transition-colors cursor-pointer border border-[#B8DEFF]"
                               >
                                 Detail
@@ -1415,15 +1418,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           ) : (
             <>
-              {/* Mobile Card View (< md:) */}
-              <div className="md:hidden divide-y divide-slate-100 bg-white">
+              {/* Mobile Card View (< md:) with spacing per ticket */}
+              <div className="md:hidden p-3 space-y-3 bg-[#F8FAFC]">
                 {urgentTickets.map((ticket) => {
                   const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
                   return (
                     <div
                       key={ticket.id}
                       onClick={() => onNavigate('ticket-detail', ticket.id)}
-                      className="p-3.5 space-y-2 active:bg-slate-50 transition-colors cursor-pointer"
+                      className="bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-[#1765B3]/40 p-3.5 space-y-2.5 transition-all cursor-pointer"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono-numbers font-bold text-xs text-[#1765B3]">
@@ -1439,7 +1442,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {ticket.title}
                       </div>
 
-                      <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[10px] font-mono-numbers">
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[10px] font-mono-numbers">
                         <span
                           className={`font-semibold ${
                             sla.isOverdue
@@ -1460,86 +1463,88 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 })}
               </div>
 
-              {/* Desktop / Tablet Table View (>= md:) */}
-              <table className="hidden md:table w-full text-left border-collapse text-xs min-w-[640px]">
-              <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                  <th className="py-3 px-4">Nomor Tiket</th>
-                  <th className="py-3 px-4">Subjek Kendala</th>
-                  <th className="py-3 px-4">Prioritas</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Petugas PIC</th>
-                  <th className="py-3 px-4">SLA Deadline</th>
-                  <th className="py-3 px-4 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs text-[#0F172A]">
-                {urgentTickets.map((ticket) => {
-                  const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
-                  return (
-                    <tr
-                      key={ticket.id}
-                      className="hover:bg-[#F8FAFC] transition-colors cursor-pointer group"
-                      onClick={() => onNavigate('ticket-detail', ticket.id)}
-                    >
-                      <td className="py-3.5 px-4 font-mono-numbers font-bold text-[#1765B3]">
-                        #{ticket.ticketNumber}
-                      </td>
-                      <td className="py-3.5 px-4 max-w-xs">
-                        <div className="font-semibold text-[#0F172A] group-hover:text-[#2589E8] transition-colors truncate">
-                          {ticket.title}
-                        </div>
-                        <div className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {ticket.categoryName} · {ticket.type}
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <PriorityBadge priority={ticket.priority} size="sm" />
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <StatusBadge status={ticket.status} size="sm" />
-                      </td>
-                      <td className="py-3.5 px-4">
-                        {ticket.currentPicName ? (
-                          <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded-full bg-[#EFF8FF] text-[#1765B3] text-[10px] flex items-center justify-center font-bold border border-[#B8DEFF]">
-                              {ticket.currentPicName.charAt(0)}
-                            </span>
-                            {ticket.currentPicName}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 italic font-medium">Belum Ditugaskan</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 font-mono-numbers">
-                        <span
-                          className={`text-[11px] font-semibold ${
-                            sla.isOverdue
-                              ? 'text-rose-600'
-                              : sla.isNearingBreach
-                              ? 'text-amber-600'
-                              : 'text-slate-600'
-                          }`}
-                        >
-                          {sla.remainingFormatted}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onNavigate('ticket-detail', ticket.id);
-                          }}
-                          className="px-3 py-1.5 text-xs font-semibold text-[#0A3D73] bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#EFF8FF] hover:border-[#B8DEFF] shadow-2xs transition-colors cursor-pointer"
-                        >
-                          Buka Tiket
-                        </button>
-                      </td>
+              {/* Desktop / Tablet Table View (>= md:) with clean row spacing per ticket */}
+              <div className="hidden md:block overflow-x-auto p-3 sm:p-4 bg-[#F8FAFC]">
+                <table className="w-full text-left border-separate border-spacing-y-2.5 text-xs min-w-[640px]">
+                  <thead>
+                    <tr className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="pb-2.5 px-4">Nomor Tiket</th>
+                      <th className="pb-2.5 px-4">Subjek Kendala</th>
+                      <th className="pb-2.5 px-4">Prioritas</th>
+                      <th className="pb-2.5 px-4">Status</th>
+                      <th className="pb-2.5 px-4">Petugas PIC</th>
+                      <th className="pb-2.5 px-4">SLA Deadline</th>
+                      <th className="pb-2.5 px-4 text-right">Aksi</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="text-xs text-[#0F172A]">
+                    {urgentTickets.map((ticket) => {
+                      const sla = getSlaStatus(ticket.createdAt, ticket.dueAt, ticket.status, ticket.resolvedAt);
+                      return (
+                        <tr
+                          key={ticket.id}
+                          className="hover:bg-[#F0F7FF]/60 transition-all cursor-pointer group shadow-2xs"
+                          onClick={() => onNavigate('ticket-detail', ticket.id)}
+                        >
+                          <td className="py-3.5 px-4 font-mono-numbers font-bold text-[#1765B3] bg-white group-hover:bg-[#F0F7FF]/60 rounded-l-xl border-y border-l border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            #{ticket.ticketNumber}
+                          </td>
+                          <td className="py-3.5 px-4 max-w-xs bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <div className="font-semibold text-[#0F172A] group-hover:text-[#2589E8] transition-colors truncate">
+                              {ticket.title}
+                            </div>
+                            <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                              {ticket.categoryName} · {ticket.type}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <PriorityBadge priority={ticket.priority} size="sm" />
+                          </td>
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <StatusBadge status={ticket.status} size="sm" />
+                          </td>
+                          <td className="py-3.5 px-4 bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            {ticket.currentPicName ? (
+                              <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                                <span className="w-5 h-5 rounded-full bg-[#EFF8FF] text-[#1765B3] text-[10px] flex items-center justify-center font-bold border border-[#B8DEFF]">
+                                  {ticket.currentPicName.charAt(0)}
+                                </span>
+                                {ticket.currentPicName}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 italic font-medium">Belum Ditugaskan</span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono-numbers bg-white group-hover:bg-[#F0F7FF]/60 border-y border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <span
+                              className={`text-[11px] font-semibold ${
+                                sla.isOverdue
+                                  ? 'text-rose-600'
+                                  : sla.isNearingBreach
+                                  ? 'text-amber-600'
+                                  : 'text-slate-600'
+                              }`}
+                            >
+                              {sla.remainingFormatted}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right bg-white group-hover:bg-[#F0F7FF]/60 rounded-r-xl border-y border-r border-slate-200/90 group-hover:border-[#1765B3]/40 transition-colors">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onNavigate('ticket-detail', ticket.id);
+                              }}
+                              className="px-3 py-1.5 text-xs font-semibold text-[#0A3D73] bg-white border border-[#E2E8F0] rounded-lg hover:bg-[#EFF8FF] hover:border-[#B8DEFF] shadow-2xs transition-colors cursor-pointer"
+                            >
+                              Buka Tiket
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </>
           )}
         </div>
