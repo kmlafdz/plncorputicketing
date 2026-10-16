@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   Settings,
   User,
-  LogOut,
   SlidersHorizontal,
   X,
 } from 'lucide-react';
@@ -233,19 +232,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-0.5">
             {navItem('profile', 'Profil Pengguna', User)}
             {isAdmin && navItem('settings', 'Pengaturan Aplikasi', Settings)}
-            <button
-              onClick={() => {
-                if (onCloseMobile) onCloseMobile();
-                onLogout();
-              }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors group cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-4 rounded-full bg-transparent" />
-                <LogOut className="w-4 h-4 text-rose-400 group-hover:text-rose-600" />
-                <span>Keluar (Logout)</span>
-              </div>
-            </button>
           </div>
         </div>
       </div>
