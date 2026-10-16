@@ -64,7 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       setIsVisible(false);
       const timer = setTimeout(() => {
         setIsRendered(false);
-      }, 260);
+      }, 380);
       return () => clearTimeout(timer);
     }
   }, [isMobileOpen]);
@@ -366,7 +366,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           {/* Backdrop with 0ms Delay Frosted Fade */}
           <div
-            className={`fixed inset-0 bg-slate-950/45 backdrop-blur-xs transition-opacity duration-200 ease-out will-change-[opacity] ${
+            className={`fixed inset-0 bg-slate-950/45 backdrop-blur-xs transition-opacity duration-320 ease-out will-change-[opacity] ${
               isVisible ? 'opacity-100' : 'opacity-0'
             }`}
             onClick={onCloseMobile}
@@ -383,7 +383,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 : 'translateX(-100%)',
               transition: isDragging
                 ? 'none'
-                : 'transform 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+                : 'transform 380ms cubic-bezier(0.22, 1, 0.36, 1)',
             }}
             className="relative w-72 max-w-[82vw] h-full bg-white shadow-2xl z-10 will-change-transform flex flex-col border-r border-slate-200 select-none overflow-hidden"
           >

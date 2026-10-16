@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Ticket as TicketIcon,
   Clock,
@@ -21,6 +21,9 @@ import {
   SlidersHorizontal,
   ShieldCheck,
   ArrowUpRight,
+  Calendar,
+  BarChart3,
+  Filter,
 } from 'lucide-react';
 import { Ticket, User as UserType } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -99,26 +102,150 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     })
     .slice(0, 5);
 
-  // Live PIC workloads calculated for Admin Command Center
-  const picWorkloads = useMemo(() => {
-    if (!isAdmin) return [];
-    const pics = [
-      { id: 'user-pic-1', tag: 'PIC 1', name: 'Budi Santoso', team: 'Network & Infrastructure' },
-      { id: 'user-pic-2', tag: 'PIC 2', name: 'Rina Wijaya', team: 'IT Support & Hardware' },
-      { id: 'user-pic-3', tag: 'PIC 3', name: 'Dimas Aditya', team: 'Application Support' },
-    ];
-    return pics.map((p) => {
-      const assigned = tickets.filter((t) => t.currentPicId === p.id);
-      const active = assigned.filter((t) =>
-        ['Ditugaskan', 'Dalam Proses', 'Menunggu Pelapor', 'Menunggu Pihak Ketiga'].includes(t.status)
-      ).length;
-      const done = assigned.filter((t) => ['Selesai', 'Ditutup'].includes(t.status)).length;
-      let load: 'Normal' | 'Sibuk' | 'Penuh' = 'Normal';
-      if (active >= 4) load = 'Penuh';
-      else if (active >= 2) load = 'Sibuk';
-      return { ...p, active, done, total: assigned.length, load };
+  // Filter waktu pembuatan laporan ticketing (hari, minggu, bulan, tahun)
+  const [intakeTimeFilter, setIntakeTimeFilter] = useState<'hari' | 'minggu' | 'bulan' | 'tahun'>('hari');
+
+  // Kalkulasi statistik waktu masuknya laporan tiket
+  const intakeAnalytics = useMemo(() => {
+    const now = new Date();
+    const nowTime = now.getTime();
+
+    // Filter tiket berdasarkan rentang waktu pembuatan (createdAt)
+    const filtered = accessibleTickets.filter((t) => {
+      const created = new Date(t.createdAt);
+      if (isNaN(created.getTime())) return false;
+      const diffMs = nowTime - created.getTime();
+
+      if (intakeTimeFilter === 'hari') {
+        const diffHours = diffMs / (1000 * 60 * 60);
+        return diffHours >= 0 && diffHours <= 24;
+      }
+      if (intakeTimeFilter === 'minggu') {
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+        return diffDays >= 0 && diffDays <= 7;
+      }
+      if (intakeTimeFilter === 'bulan') {
+        const diffDays = diffMs / (1000 * 60 * 60 * 24);
+        return diffDays >= 0 && diffDays <= 30;
+      }
+      return created.getFullYear() === now.getFullYear();
     });
-  }, [tickets, isAdmin]);
+
+    // Klasifikasi Jam Kerja Diklat (Senin - Jumat, 07:30 - 17:00 WIB)
+    let officeHoursCount = 0;
+    let afterHoursCount = 0;
+    const hourHistogram: { [hour: number]: number } = {};
+    for (let h = 0; h < 24; h++) hourHistogram[h] = 0;
+
+    filtered.forEach((t) => {
+      const d = new Date(t.createdAt);
+      const hour = d.getHours();
+      const day = d.getDay();
+      hourHistogram[hour] = (hourHistogram[hour] || 0) + 1;
+
+      const isWorkday = day >= 1 && day <= 5;
+      const isWorkHours = hour >= 7 && hour < 17;
+      if (isWorkday && isWorkHours) {
+        officeHoursCount++;
+      } else {
+        afterHoursCount++;
+      }
+    });
+
+    // Waktu Puncak Masuk Laporan (Peak Window)
+    let peakHour = 9;
+    let maxHourVolume = 0;
+    Object.entries(hourHistogram).forEach(([h, count]) => {
+      if (count > maxHourVolume) {
+        maxHourVolume = count;
+        peakHour = parseInt(h, 10);
+      }
+    });
+    const peakHourFormatted = `${String(peakHour).padStart(2, '0')}:00 - ${String((peakHour + 2) % 24).padStart(2, '0')}:00 WIB`;
+
+    // Distribusi Frekuensi Berdasarkan Filter Terpilih
+    type DistributionBucket = { label: string; subLabel: string; count: number; percentage: number };
+    let buckets: DistributionBucket[] = [];
+
+    if (intakeTimeFilter === 'hari') {
+      const slots = [
+        { label: '00:00 - 04:00', subLabel: 'Dini Hari', hours: [0, 1, 2, 3] },
+        { label: '04:00 - 08:00', subLabel: 'Pagi Awal', hours: [4, 5, 6, 7] },
+        { label: '08:00 - 12:00', subLabel: 'Pagi Kerja', hours: [8, 9, 10, 11] },
+        { label: '12:00 - 16:00', subLabel: 'Siang Diklat', hours: [12, 13, 14, 15] },
+        { label: '16:00 - 20:00', subLabel: 'Sore Hari', hours: [16, 17, 18, 19] },
+        { label: '20:00 - 24:00', subLabel: 'Malam Hari', hours: [20, 21, 22, 23] },
+      ];
+      const maxCount = Math.max(...slots.map((s) => s.hours.reduce((acc, h) => acc + (hourHistogram[h] || 0), 0)), 1);
+      buckets = slots.map((s) => {
+        const count = s.hours.reduce((acc, h) => acc + (hourHistogram[h] || 0), 0);
+        return {
+          label: s.label,
+          subLabel: s.subLabel,
+          count,
+          percentage: Math.round((count / maxCount) * 100),
+        };
+      });
+    } else if (intakeTimeFilter === 'minggu') {
+      const dayCounts: { [d: number]: number } = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+      filtered.forEach((t) => {
+        const d = new Date(t.createdAt).getDay();
+        dayCounts[d] = (dayCounts[d] || 0) + 1;
+      });
+      const order = [1, 2, 3, 4, 5, 6, 0];
+      const dayFullNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const maxCount = Math.max(...Object.values(dayCounts), 1);
+      buckets = order.map((dIndex) => ({
+        label: dayFullNames[dIndex],
+        subLabel: dIndex >= 1 && dIndex <= 5 ? 'Hari Kerja' : 'Akhir Pekan',
+        count: dayCounts[dIndex],
+        percentage: Math.round((dayCounts[dIndex] / maxCount) * 100),
+      }));
+    } else if (intakeTimeFilter === 'bulan') {
+      const weekCounts = [0, 0, 0, 0];
+      filtered.forEach((t) => {
+        const date = new Date(t.createdAt).getDate();
+        if (date <= 7) weekCounts[0]++;
+        else if (date <= 14) weekCounts[1]++;
+        else if (date <= 21) weekCounts[2]++;
+        else weekCounts[3]++;
+      });
+      const maxCount = Math.max(...weekCounts, 1);
+      buckets = [
+        { label: 'Minggu 1', subLabel: 'Tgl 1 - 7', count: weekCounts[0], percentage: Math.round((weekCounts[0] / maxCount) * 100) },
+        { label: 'Minggu 2', subLabel: 'Tgl 8 - 14', count: weekCounts[1], percentage: Math.round((weekCounts[1] / maxCount) * 100) },
+        { label: 'Minggu 3', subLabel: 'Tgl 15 - 21', count: weekCounts[2], percentage: Math.round((weekCounts[2] / maxCount) * 100) },
+        { label: 'Minggu 4', subLabel: 'Tgl 22 - 31', count: weekCounts[3], percentage: Math.round((weekCounts[3] / maxCount) * 100) },
+      ];
+    } else {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const monthCounts = new Array(12).fill(0);
+      filtered.forEach((t) => {
+        const m = new Date(t.createdAt).getMonth();
+        monthCounts[m]++;
+      });
+      const maxCount = Math.max(...monthCounts, 1);
+      buckets = monthNames.map((name, idx) => ({
+        label: name,
+        subLabel: `Bulan ${idx + 1}`,
+        count: monthCounts[idx],
+        percentage: Math.round((monthCounts[idx] / maxCount) * 100),
+      }));
+    }
+
+    const sortedTickets = [...filtered].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      totalCount: filtered.length,
+      officeHoursCount,
+      afterHoursCount,
+      peakHourFormatted,
+      buckets,
+      tickets: sortedTickets,
+    };
+  }, [accessibleTickets, intakeTimeFilter]);
 
   return (
     <div className="space-y-6">
@@ -280,121 +407,263 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           )}
 
-          {/* Live PIC Capacity & Dispatch Monitor */}
-          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          {/* STATISTIK PEMBUATAN WAKTU TICKETING */}
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 sm:p-6 space-y-5">
+            {/* Header & Filter Controls (Hari, Minggu, Bulan, Tahun) */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
-                  <Wrench className="w-4 h-4 text-[#1765B3]" />
-                  Status Beban Kerja Petugas PIC (Real-Time Dispatch)
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Pantau ketersediaan petugas penanganan sebelum melakukan penugasan tiket baru.
+                <div className="flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-xl bg-[#EFF8FF] text-[#1765B3] border border-[#B8DEFF] flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-[#1765B3]" />
+                  </span>
+                  <h2 className="text-base sm:text-lg font-bold text-[#0F172A] font-heading">
+                    Statistik Pembuatan Waktu Ticketing
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Monitoring pola dan distribusi waktu masuknya laporan kendala operasional PLN Corporate University.
                 </p>
               </div>
-              <button
-                onClick={() => onNavigate('pic-management')}
-                className="text-xs font-bold text-[#2589E8] hover:text-[#1765B3] flex items-center gap-1 cursor-pointer transition-colors"
-              >
-                <span>Kelola Detail PIC</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {picWorkloads.map((pic) => (
-                <div
-                  key={pic.id}
-                  onClick={() => onNavigate('pic-management')}
-                  className="p-4 rounded-xl border border-slate-200 bg-[#F8FAFC] hover:bg-white hover:border-[#B8DEFF] hover:shadow-xs transition-all cursor-pointer space-y-3 group"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0A3D73] to-[#1765B3] text-white font-bold flex items-center justify-center text-xs shadow-2xs">
-                        {pic.tag}
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900 group-hover:text-[#1765B3] transition-colors">
-                          {pic.name}
-                        </div>
-                        <div className="text-[11px] text-slate-500 font-medium">
-                          {pic.team}
-                        </div>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        pic.load === 'Penuh'
-                          ? 'bg-rose-100 text-rose-800'
-                          : pic.load === 'Sibuk'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-emerald-100 text-emerald-800'
-                      }`}
-                    >
-                      {pic.load}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-center pt-1 border-t border-slate-200/60 font-mono-numbers">
-                    <div className="p-1.5 bg-white rounded-lg border border-slate-200/80">
-                      <span className="text-[10px] text-slate-400 block font-sans">Beban Aktif</span>
-                      <span className="text-sm font-extrabold text-[#1765B3]">{pic.active} tiket</span>
-                    </div>
-                    <div className="p-1.5 bg-white rounded-lg border border-slate-200/80">
-                      <span className="text-[10px] text-slate-400 block font-sans">Selesai</span>
-                      <span className="text-sm font-extrabold text-emerald-700">{pic.done} tuntas</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Admin Command Quick Matrix */}
-          <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
-            <div>
-              <h2 className="text-sm font-bold text-[#0F172A] flex items-center gap-2 font-heading">
-                <SlidersHorizontal className="w-4 h-4 text-[#2589E8]" />
-                Pusat Kontrol & Konfigurasi Helpdesk (Admin)
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Akses cepat modul konfigurasi operasional ticketing PLN Corporate University.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {[
-                { id: 'pic-management', label: 'Manajemen PIC', desc: 'Beban & keahlian', icon: Users, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-                { id: 'auto-assignment', label: 'Auto-Assign', desc: 'Aturan routing tim', icon: SlidersHorizontal, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-                { id: 'user-management', label: 'Manajemen User', desc: 'Akun, NIP & Role', icon: UserCog, color: 'text-sky-600 bg-sky-50 border-sky-200' },
-                { id: 'category-management', label: 'Kategori Tiket', desc: 'Kode #TCU-XXXX', icon: Layers, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-                { id: 'sla-management', label: 'Matriks SLA', desc: 'Target respon/resolusi', icon: Clock, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-                { id: 'audit-log', label: 'Audit Trail', desc: 'Log kepatuhan sistem', icon: ShieldCheck, color: 'text-purple-600 bg-purple-50 border-purple-200' },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
+              {/* Filter Tabs: Hari, Minggu, Bulan, Tahun */}
+              <div className="flex items-center p-1 bg-[#F1F5F9] rounded-xl border border-slate-200 text-xs font-semibold self-stretch sm:self-auto overflow-x-auto">
+                {(
+                  [
+                    { id: 'hari', label: 'Hari Ini' },
+                    { id: 'minggu', label: 'Minggu Ini' },
+                    { id: 'bulan', label: 'Bulan Ini' },
+                    { id: 'tahun', label: 'Tahun Ini' },
+                  ] as const
+                ).map((tab) => (
                   <button
-                    key={item.id}
-                    onClick={() => onNavigate(item.id)}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-[#F8FAFC] hover:bg-white hover:border-[#B8DEFF] hover:shadow-xs transition-all text-left flex flex-col justify-between space-y-2 group cursor-pointer"
+                    key={tab.id}
+                    onClick={() => setIntakeTimeFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                      intakeTimeFilter === tab.id
+                        ? 'bg-white text-[#0A3D73] font-bold shadow-2xs border border-slate-200/60'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Top Metrics Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200 shadow-2xs space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block font-heading">
+                  Total Laporan Masuk
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-black text-[#0F172A] font-mono-numbers">
+                    {intakeAnalytics.totalCount}
+                  </span>
+                  <span className="text-xs font-medium text-slate-500">tiket</span>
+                </div>
+                <span className="text-[10px] text-slate-500 block">
+                  Periode {intakeTimeFilter === 'hari' ? '24 Jam Terakhir' : intakeTimeFilter === 'minggu' ? '7 Hari Terakhir' : intakeTimeFilter === 'bulan' ? '30 Hari Terakhir' : 'Tahun Berjalan'}
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#EFF8FF] border border-[#B8DEFF] shadow-2xs space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#0A3D73] block font-heading">
+                  Waktu Puncak Masuk
+                </span>
+                <div className="text-sm sm:text-base font-extrabold text-[#1765B3] font-mono-numbers">
+                  {intakeAnalytics.peakHourFormatted}
+                </div>
+                <span className="text-[10px] text-[#2589E8] block font-medium">
+                  Volume tertinggi tiket baru
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 shadow-2xs space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block font-heading">
+                  Jam Kerja Diklat (07:30 - 17:00)
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-black text-emerald-950 font-mono-numbers">
+                    {intakeAnalytics.officeHoursCount}
+                  </span>
+                  <span className="text-xs font-bold text-emerald-700 font-mono-numbers">
+                    ({intakeAnalytics.totalCount > 0 ? Math.round((intakeAnalytics.officeHoursCount / intakeAnalytics.totalCount) * 100) : 0}%)
+                  </span>
+                </div>
+                <span className="text-[10px] text-emerald-700 block">
+                  Masuk di jam operasional aktif
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs space-y-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 block font-heading">
+                  Luar Jam Kerja / Piket
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-black text-slate-800 font-mono-numbers">
+                    {intakeAnalytics.afterHoursCount}
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 font-mono-numbers">
+                    ({intakeAnalytics.totalCount > 0 ? Math.round((intakeAnalytics.afterHoursCount / intakeAnalytics.totalCount) * 100) : 0}%)
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-500 block">
+                  Malam hari atau akhir pekan
+                </span>
+              </div>
+            </div>
+
+            {/* Distribution Chart / Frequency Bars */}
+            <div className="p-4 sm:p-5 rounded-xl border border-slate-200 bg-[#F8FAFC] space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                <span className="text-xs font-bold text-slate-800 font-heading">
+                  Distribusi Frekuensi Waktu Masuk Laporan (
+                  {intakeTimeFilter === 'hari' ? 'Rentang Jam (WIB)' : intakeTimeFilter === 'minggu' ? 'Hari dalam Seminggu' : intakeTimeFilter === 'bulan' ? 'Mingguan dalam Sebulan' : 'Bulanan dalam Setahun'}
+                  )
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  {intakeAnalytics.totalCount} total laporan terekam
+                </span>
+              </div>
+
+              {/* Histogram Bars */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5 pt-2">
+                {intakeAnalytics.buckets.map((b, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs flex flex-col justify-between space-y-2 hover:border-[#B8DEFF] transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${item.color}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1765B3] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 group-hover:text-[#1765B3] transition-colors block leading-tight">
-                        {item.label}
-                      </span>
-                      <span className="text-[10px] text-slate-400 block mt-0.5 font-medium">
-                        {item.desc}
+                      <span className="text-[11px] font-bold text-slate-700 truncate">{b.label}</span>
+                      <span className="text-xs font-extrabold text-[#1765B3] font-mono-numbers">
+                        {b.count}
                       </span>
                     </div>
-                  </button>
-                );
-              })}
+
+                    {/* Progress Bar Track */}
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-gradient-to-r from-[#0A3D73] to-[#2589E8] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.max(b.percentage, b.count > 0 ? 12 : 0)}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="truncate">{b.subLabel}</span>
+                      <span className="font-mono-numbers">{b.count > 0 ? `${b.percentage}%` : '0%'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Ticket Intake Feed Table */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                <h3 className="text-xs font-bold text-slate-800 font-heading">
+                  Log Masuk Laporan Tiket ({intakeAnalytics.tickets.length})
+                </h3>
+                <span className="text-[11px] text-[#2589E8] font-semibold">
+                  Diurutkan berdasarkan waktu masuk terbaru
+                </span>
+              </div>
+
+              {intakeAnalytics.tickets.length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400 text-xs">
+                  Tidak ada laporan tiket yang masuk pada periode waktu yang dipilih ({intakeTimeFilter}).
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-2xs">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#F8FAFC] border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+                      <tr>
+                        <th className="py-3 px-3.5">Waktu Masuk Laporan</th>
+                        <th className="py-3 px-3.5">Nomor & Judul Tiket</th>
+                        <th className="py-3 px-3.5">Kategori & Pelapor</th>
+                        <th className="py-3 px-3.5">Prioritas</th>
+                        <th className="py-3 px-3.5">Status</th>
+                        <th className="py-3 px-3.5 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 bg-white">
+                      {intakeAnalytics.tickets.slice(0, 8).map((t) => {
+                        const dateObj = new Date(t.createdAt);
+                        const isDateValid = !isNaN(dateObj.getTime());
+                        const hour = isDateValid ? dateObj.getHours() : 0;
+                        const day = isDateValid ? dateObj.getDay() : 0;
+                        const isOfficeHour = isDateValid && day >= 1 && day <= 5 && hour >= 7 && hour < 17;
+
+                        const timeFormatted = isDateValid
+                          ? dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB'
+                          : '-';
+                        const dateFormatted = isDateValid
+                          ? dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+                          : '-';
+
+                        return (
+                          <tr key={t.id} className="hover:bg-[#F8FAFC] transition-colors">
+                            <td className="py-3 px-3.5 whitespace-nowrap">
+                              <div className="space-y-0.5">
+                                <span className="font-mono-numbers font-bold text-slate-900 block text-xs">
+                                  {timeFormatted}
+                                </span>
+                                <div className="flex items-center gap-1.5 text-[10px]">
+                                  <span className="text-slate-500">{dateFormatted}</span>
+                                  <span
+                                    className={`px-1.5 py-0.2 rounded font-semibold text-[9px] ${
+                                      isOfficeHour
+                                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                    }`}
+                                  >
+                                    {isOfficeHour ? 'Jam Kerja' : 'Luar Jam'}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="py-3 px-3.5 max-w-[240px]">
+                              <span className="font-mono text-[10px] font-bold text-[#1765B3] block">
+                                #{t.ticketNumber}
+                              </span>
+                              <span className="font-semibold text-slate-900 truncate block text-xs" title={t.title}>
+                                {t.title}
+                              </span>
+                            </td>
+
+                            <td className="py-3 px-3.5">
+                              <span className="text-slate-800 font-medium block text-xs">
+                                {t.categoryName}
+                              </span>
+                              <span className="text-slate-400 text-[11px] block truncate max-w-[160px]">
+                                {t.reporterName} ({t.department})
+                              </span>
+                            </td>
+
+                            <td className="py-3 px-3.5 whitespace-nowrap">
+                              <PriorityBadge priority={t.priority} size="sm" />
+                            </td>
+
+                            <td className="py-3 px-3.5 whitespace-nowrap">
+                              <StatusBadge status={t.status} size="sm" />
+                            </td>
+
+                            <td className="py-3 px-3.5 text-right whitespace-nowrap">
+                              <button
+                                onClick={() => onNavigate('ticket-detail', t.id)}
+                                className="px-2.5 py-1 text-[11px] font-bold bg-[#EFF8FF] text-[#1765B3] hover:bg-[#1765B3] hover:text-white rounded-lg transition-colors cursor-pointer border border-[#B8DEFF]"
+                              >
+                                Detail
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>
